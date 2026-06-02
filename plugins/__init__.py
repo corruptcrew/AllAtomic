@@ -30,7 +30,7 @@ def atomic_command(command: str, pattern: str = None, group: int = 0, **kwargs):
             "category": kwargs.get("category", "misc")
         }
         
-        logger.debug(f"✓ Registered command: {cmd_name}")
+        logger.debug(f"✓ Registered command: {cmd_name} (total: {len(REGISTERED_PLUGINS)})")
         return func
     
     return decorator
@@ -62,6 +62,8 @@ def load_all_plugins(client, config: Config) -> int:
     plugins_dir = Path(__file__).parent.parent / "plugins"
     loaded_count = 0
     
+    logger.info(f"🔍 Searching for plugins in: {plugins_dir}")
+    
     if not plugins_dir.exists():
         logger.error(f"❌ Plugins directory not found: {plugins_dir}")
         return 0
@@ -83,9 +85,12 @@ def load_all_plugins(client, config: Config) -> int:
             module_path = f"plugins.{category_dir.name}.{py_file.stem}"
             plugin_files.append(module_path)
     
+    logger.info(f"📁 Found {len(plugin_files)} plugin files to load")
+    
     # Load each plugin and register commands
     for module_path in plugin_files:
         try:
+            logger.debug(f"📦 Importing: {module_path}")
             module = importlib.import_module(module_path)
             
             # Check for __plugin__ attribute
@@ -95,6 +100,8 @@ def load_all_plugins(client, config: Config) -> int:
             
         except Exception as e:
             logger.error(f"❌ Error loading {module_path}: {e}")
+    
+    logger.info(f"📊 REGISTERED_PLUGINS after imports: {list(REGISTERED_PLUGINS.keys())}")
     
     # Now register all commands from REGISTERED_PLUGINS with the client
     for cmd_name, cmd_info in REGISTERED_PLUGINS.items():
