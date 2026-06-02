@@ -97,19 +97,6 @@ HELP_TEXT = """
 **📂 Select a category below:**
 """
 
-# Category help text template
-CATEGORY_HELP_TEXT = """
-╔═══════════════════════════════════════════════╗
-║  {emoji}  {category} Commands  {emoji}            ║
-╠═══════════════════════════════════════════════╣
-║                                               ║
-{commands}
-║                                               ║
-╚═══════════════════════════════════════════════╝
-
-**📂 Select another category:**
-"""
-
 
 def build_category_buttons():
     """Build inline keyboard buttons for all categories (HellBot style)"""
@@ -120,15 +107,25 @@ def build_category_buttons():
     for i in range(0, len(category_items), 2):
         row = []
         cat1_name, cat1_data = category_items[i]
+        # Ensure cat1_data is a dict before accessing
+        if isinstance(cat1_data, dict):
+            emoji = cat1_data.get("emoji", "📦")
+        else:
+            emoji = "📦"
         row.append(Button.inline(
-            f"{cat1_data['emoji']} {cat1_name}",
+            f"{emoji} {cat1_name}",
             data=f"help_cat_{cat1_name}"
         ))
         
         if i + 1 < len(category_items):
             cat2_name, cat2_data = category_items[i + 1]
+            # Ensure cat2_data is a dict before accessing
+            if isinstance(cat2_data, dict):
+                emoji = cat2_data.get("emoji", "📦")
+            else:
+                emoji = "📦"
             row.append(Button.inline(
-                f"{cat2_data['emoji']} {cat2_name}",
+                f"{emoji} {cat2_name}",
                 data=f"help_cat_{cat2_name}"
             ))
         
@@ -143,32 +140,6 @@ def build_category_buttons():
     return buttons
 
 
-def build_category_view_buttons(category_name):
-    """Build buttons for category view with back button"""
-    buttons = []
-    
-    # Back button
-    buttons.append([Button.inline("◀️ Back", data="help_back")])
-    
-    # Close button
-    buttons.append([Button.inline("❌ Close", data="help_close")])
-    
-    return buttons
-
-
-def format_category_commands(category_name):
-    """Format commands list for a category"""
-    cat_data = HELP_CATEGORIES.get(category_name, {})
-    commands = cat_data.get("commands", [])
-    
-    # Format each command
-    cmd_list = ""
-    for cmd in commands:
-        cmd_list += f"║  •  `.{cmd}`\n"
-    
-    return cmd_list
-
-
 @atomic_command(
     "help",
     pattern=r"\.help",
@@ -179,9 +150,21 @@ def format_category_commands(category_name):
 async def help_handler(event):
     """Show HellBot-style help menu with inline category buttons"""
     try:
-        # Get total stats
-        total_commands = len(REGISTERED_PLUGINS) if REGISTERED_PLUGINS else 84
-        num_plugins = len(set(cmd.get("category", "core") for cmd in (REGISTERED_PLUGINS or []))) or 20
+        # Get total stats - safely handle REGISTERED_PLUGINS
+        if REGISTERED_PLUGINS and isinstance(REGISTERED_PLUGINS, list):
+            # Count commands safely
+            total_commands = len(REGISTERED_PLUGINS)
+            # Count unique categories safely
+            categories = set()
+            for cmd in REGISTERED_PLUGINS:
+                if isinstance(cmd, dict):
+                    categories.add(cmd.get("category", "core"))
+                else:
+                    categories.add("core")
+            num_plugins = len(categories) or 20
+        else:
+            total_commands = 84
+            num_plugins = 20
         
         # Build message
         msg = HELP_TEXT.format(
