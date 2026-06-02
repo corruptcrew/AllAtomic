@@ -45,7 +45,7 @@ python-dateutil==2.8.2
 
 # Image Processing
 google-cloud-translate==3.15.1
-removebg==1.0.0
+removebg==0.4
 wand==0.6.11
 
 # Music & Voice
