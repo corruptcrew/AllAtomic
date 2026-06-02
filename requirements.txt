@@ -49,7 +49,7 @@ removebg==0.4
 wand==0.6.11
 
 # Music & Voice
-py-tgcalls==1.2.0
+py-tgcalls==1.2.9
 ntgcalls==1.0.0
 
 # Compression
