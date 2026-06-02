@@ -6,7 +6,6 @@ Handles inline button callbacks (HellBot-style help menu)
 from telethon import events
 from telethon.tl.custom import Button
 from plugins import register_handler
-from app.logger import log
 
 # Plugin metadata
 __plugin__ = {
@@ -108,8 +107,6 @@ async def help_callback_handler(event):
         if isinstance(data, bytes):
             data = data.decode('utf-8')
         
-        log.info(f"Callback received: {data}")
-        
         # Handle main help menu back button
         if data == "help_back":
             await event.edit(HELP_MAIN_TEXT, buttons=build_category_buttons())
@@ -123,11 +120,9 @@ async def help_callback_handler(event):
         # Handle category selection
         elif data.startswith("help_cat_"):
             category_name = data.replace("help_cat_", "")
-            log.info(f"Category requested: {category_name}")
             
             # Get category data safely
             cat_data = HELP_CATEGORIES.get(category_name)
-            log.info(f"Category data type: {type(cat_data)}, value: {cat_data}")
             
             if cat_data and isinstance(cat_data, dict):
                 emoji = cat_data.get("emoji", "📦")
@@ -154,11 +149,9 @@ async def help_callback_handler(event):
                 await event.edit(msg, parse_mode="md", buttons=buttons)
                 await event.answer(f"{category_name} commands", alert=False)
             else:
-                log.error(f"Category not found or invalid: {category_name}")
                 await event.answer("Category not found", alert=True)
         
     except Exception as e:
-        log.error(f"Callback error: {e}")
         await event.answer(f"Error: {str(e)}", alert=True)
 
 
