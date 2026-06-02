@@ -28,15 +28,14 @@ START_TIME = datetime.now()
 )
 async def alive_handler(event):
     """Alive command handler"""
-    from app import config, client, db
-    
     try:
         # Calculate uptime
         uptime = get_readable_time((datetime.now() - START_TIME).total_seconds())
         
-        # Get user info
-        user_name = client.full_name
-        user_id = client.user_id
+        # Get user info from event client
+        me = await event.client.get_me()
+        user_name = me.first_name or "Unknown"
+        user_id = me.id
         
         # Format message
         alive_msg = f"""
@@ -80,8 +79,6 @@ async def alive_handler(event):
 )
 async def status_handler(event):
     """Quick status command"""
-    from app import client
-    
     uptime = get_readable_time((datetime.now() - START_TIME).total_seconds())
     
     status = f"""
