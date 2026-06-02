@@ -97,20 +97,39 @@ def load_all_plugins(client, config: Config) -> int:
     for cmd_name, cmd_info in REGISTERED_PLUGINS.items():
         if cmd_info and "function" in cmd_info:
             try:
-                pattern = cmd_info.get("pattern", f"\\.{cmd_name}")
                 func = cmd_info["function"]
                 
-                # Create wrapper that calls the original function
-                async def wrapper(event, handler_func=func):
-                    try:
-                        await handler_func(event)
-                    except Exception as e:
-                        logger.error(f"❌ Error in {cmd_name}: {e}")
-                
-                # Use client.add_handler() method
-                client.add_handler(wrapper, pattern=pattern)
-                loaded_count += 1
-                logger.debug(f"✅ Registered: {cmd_name}")
+                # Check if this is a custom event handler (like CallbackQuery)
+                if cmd_info.get("is_handler") or "event_type" in cmd_info:
+                    event_type = cmd_info.get("event_type", events.NewMessage)
+                    handler_kwargs = cmd_info.get("kwargs", {})
+                    
+                    # Create wrapper that calls the original function
+                    async def wrapper(event, handler_func=func):
+                        try:
+                            await handler_func(event)
+                        except Exception as e:
+                            logger.error(f"❌ Error in {cmd_name}: {e}")
+                    
+                    # Register with event type and kwargs
+                    client.add_handler(wrapper, event_type, **handler_kwargs)
+                    loaded_count += 1
+                    logger.debug(f"✅ Registered handler: {cmd_name}")
+                else:
+                    # Regular command with pattern
+                    pattern = cmd_info.get("pattern", f"\\.{cmd_name}")
+                    
+                    # Create wrapper that calls the original function
+                    async def wrapper(event, handler_func=func):
+                        try:
+                            await handler_func(event)
+                        except Exception as e:
+                            logger.error(f"❌ Error in {cmd_name}: {e}")
+                    
+                    # Use client.add_handler() method
+                    client.add_handler(wrapper, pattern=pattern)
+                    loaded_count += 1
+                    logger.debug(f"✅ Registered: {cmd_name}")
                 
             except Exception as e:
                 logger.error(f"❌ Failed to register {cmd_name}: {e}")
