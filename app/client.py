@@ -7,8 +7,8 @@ import asyncio
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
 from telethon.errors import SessionPasswordNeededError
-from ..app.config import Config
-from ..app.logger import logger
+from .config import Config
+from .logger import logger
 
 class AtomicClient:
     """Telethon client wrapper with atomic operations"""
