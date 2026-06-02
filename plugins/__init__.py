@@ -1,0 +1,201 @@
+"""
+Plugin System for AllAtomic Userbot
+Auto-discovers and loads plugins from plugins/ directory
+"""
+
+import os
+import importlib
+from pathlib import Path
+from typing import List, Dict
+from telethon import events
+
+from app.logger import logger
+from app.config import Config
+
+# Plugin registry
+REGISTERED_PLUGINS: Dict[str, dict] = {}
+
+def atomic_command(command: str, pattern: str = None, group: int = 0, **kwargs):
+    """
+    Decorator for registering atomic commands
+    
+    Usage:
+        @atomic_command("ping", pattern=r"\.ping")
+        async def ping_cmd(event):
+            await event.reply("Pong! 💜")
+    """
+    def decorator(func):
+        # Store command info
+        cmd_name = command
+        cmd_pattern = pattern or f"\\.{command}"
+        
+        REGISTERED_PLUGINS[cmd_name] = {
+            "function": func,
+            "pattern": cmd_pattern,
+            "group": group,
+            "kwargs": kwargs,
+            "help": kwargs.get("help", "No description"),
+            "usage": kwargs.get("usage", f".{command}"),
+            "category": kwargs.get("category", "misc")
+        }
+        
+        logger.debug(f"✓ Registered command: {cmd_name}")
+        return func
+    
+    return decorator
+
+def register_handler(event_type=events.NewMessage, **kwargs):
+    """
+    Decorator for registering custom event handlers
+    
+    Usage:
+        @register_handler(pattern=r".*")
+        async def handler(event):
+            pass
+    """
+    def decorator(func):
+        REGISTERED_PLUGINS[func.__name__] = {
+            "function": func,
+            "event_type": event_type,
+            "kwargs": kwargs,
+            "is_handler": True
+        }
+        return func
+    return decorator
+
+def load_plugin(module_path: str, client) -> bool:
+    """Load a single plugin module"""
+    try:
+        # Import module
+        module = importlib.import_module(module_path)
+        
+        # Register commands/handlers from module
+        if hasattr(module, "__commands__"):
+            for cmd in module.__commands__:
+                register_command(cmd, client)
+        
+        logger.debug(f"✓ Loaded plugin: {module_path}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"❌ Failed to load plugin {module_path}: {e}")
+        return False
+
+def register_command(cmd_info: dict, client):
+    """Register a command with the client"""
+    func = cmd_info["function"]
+    pattern = cmd_info.get("pattern")
+    group = cmd_info.get("group", 0)
+    kwargs = cmd_info.get("kwargs", {})
+    
+    # Create event filter
+    event = events.NewMessage(pattern=pattern, **kwargs)
+    
+    # Add handler
+    client.add_handler(func, event=event, group=group)
+
+def load_all_plugins(client, config: Config) -> int:
+    """
+    Load all plugins from plugins/ directory
+    
+    Returns number of loaded plugins
+    """
+    plugins_dir = Path(__file__).parent.parent / "plugins"
+    loaded_count = 0
+    
+    if not plugins_dir.exists():
+        logger.error(f"❌ Plugins directory not found: {plugins_dir}")
+        return 0
+    
+    # Find all plugin modules
+    plugin_files = []
+    
+    for category_dir in plugins_dir.iterdir():
+        if not category_dir.is_dir():
+            continue
+        
+        if category_dir.name.startswith("__"):
+            continue
+        
+        # Look for Python files in category directory
+        for py_file in category_dir.glob("*.py"):
+            if py_file.name.startswith("__"):
+                continue
+            
+            # Convert path to module path
+            module_path = f"plugins.{category_dir.name}.{py_file.stem}"
+            plugin_files.append(module_path)
+    
+    # Load each plugin
+    for module_path in plugin_files:
+        try:
+            module = importlib.import_module(module_path)
+            
+            # Check for __plugin__ attribute (plugin metadata)
+            if hasattr(module, "__plugin__"):
+                plugin_info = module.__plugin__
+                logger.info(f"  📦 {plugin_info.get('name', module_path)}")
+            
+            # Register commands from module
+            if hasattr(module, "commands"):
+                for cmd_name, cmd_info in module.commands.items():
+                    cmd_info["function"] = getattr(module, cmd_name, None)
+                    if cmd_info["function"]:
+                        register_command(cmd_info, client)
+                        loaded_count += 1
+            
+            # Auto-register functions with __atomic_command__ attribute
+            for attr_name in dir(module):
+                attr = getattr(module, attr_name)
+                if callable(attr) and hasattr(attr, "__atomic_command__"):
+                    cmd_name = attr.__atomic_command__
+                    REGISTERED_PLUGINS[cmd_name] = {
+                        "function": attr,
+                        "pattern": attr.__atomic_kwargs__.get("pattern", f"\\.{cmd_name}"),
+                        "group": getattr(attr, "__atomic_group__", 0),
+                        "kwargs": attr.__atomic_kwargs__,
+                    }
+                    
+                    # Register with client
+                    pattern = REGISTERED_PLUGINS[cmd_name]["pattern"]
+                    group = REGISTERED_PLUGINS[cmd_name]["group"]
+                    event = events.NewMessage(pattern=pattern)
+                    client.add_handler(attr, event=event, group=group)
+                    loaded_count += 1
+            
+        except Exception as e:
+            logger.error(f"❌ Error loading {module_path}: {e}")
+    
+    logger.info(f"💜 Total commands registered: {loaded_count}")
+    return loaded_count
+
+def get_plugin_info(plugin_name: str) -> dict:
+    """Get info about a specific plugin"""
+    return REGISTERED_PLUGINS.get(plugin_name, {})
+
+def get_all_commands() -> List[dict]:
+    """Get list of all registered commands"""
+    commands = []
+    for name, info in REGISTERED_PLUGINS.items():
+        commands.append({
+            "name": name,
+            "help": info.get("help", "No description"),
+            "usage": info.get("usage", f".{name}"),
+            "category": info.get("category", "misc")
+        })
+    return commands
+
+def get_commands_by_category(category: str) -> List[dict]:
+    """Get commands filtered by category"""
+    commands = get_all_commands()
+    return [cmd for cmd in commands if cmd.get("category") == category]
+
+__all__ = [
+    "atomic_command",
+    "register_handler",
+    "load_all_plugins",
+    "get_plugin_info",
+    "get_all_commands",
+    "get_commands_by_category",
+    "REGISTERED_PLUGINS"
+]

@@ -1,0 +1,57 @@
+{
+  "name": "AllAtomic Userbot",
+  "description": "The Ultimate Telegram Userbot - 200+ commands, group management, media downloads, and more",
+  "repository": "https://github.com/corruptcrew/AllAtomic",
+  "logo": "https://raw.githubusercontent.com/corruptcrew/AllAtomic/main/assets/logo.png",
+  "keywords": ["telegram", "userbot", "telethon", "automation"],
+  "env": {
+    "API_ID": {
+      "description": "Get from my.telegram.org",
+      "required": true
+    },
+    "API_HASH": {
+      "description": "Get from my.telegram.org",
+      "required": true
+    },
+    "SESSION_STRING": {
+      "description": "Run generate_string_session.py to get this",
+      "required": true
+    },
+    "OWNER_ID": {
+      "description": "Your Telegram ID - get from @userinfobot",
+      "required": true
+    },
+    "DATABASE_URL": {
+      "description": "PostgreSQL URL - Heroku auto-provides this",
+      "required": true
+    },
+    "HANDLER": {
+      "description": "Command prefix",
+      "value": ".",
+      "required": false
+    },
+    "OPENAI_API_KEY": {
+      "description": "For AI chat features (optional)",
+      "required": false
+    },
+    "HEROKU_API_KEY": {
+      "description": "For Heroku commands (optional)",
+      "required": false
+    },
+    "HEROKU_APP_NAME": {
+      "description": "Your Heroku app name (optional)",
+      "required": false
+    }
+  },
+  "addons": ["heroku-postgresql"],
+  "buildpacks": [
+    {"url": "heroku/python"},
+    {"url": "https://github.com/heroku/heroku-buildpack-ffmpeg"}
+  ],
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "eco"
+    }
+  }
+}
