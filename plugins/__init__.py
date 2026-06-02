@@ -4,7 +4,6 @@ Auto-discovers and loads plugins from plugins/ directory
 """
 
 import importlib
-import inspect
 from pathlib import Path
 from typing import List, Dict
 from telethon import events
@@ -99,7 +98,6 @@ def load_all_plugins(client, config: Config) -> int:
         if cmd_info and "function" in cmd_info:
             try:
                 pattern = cmd_info.get("pattern", f"\\.{cmd_name}")
-                group = cmd_info.get("group", 0)
                 func = cmd_info["function"]
                 
                 # Create wrapper that calls the original function
@@ -109,8 +107,8 @@ def load_all_plugins(client, config: Config) -> int:
                     except Exception as e:
                         logger.error(f"❌ Error in {cmd_name}: {e}")
                 
-                # Use @client.on() pattern by calling on() directly
-                client.on(events.NewMessage(pattern=pattern))(wrapper)
+                # Use client.add_handler() method
+                client.add_handler(wrapper, pattern=pattern)
                 loaded_count += 1
                 logger.debug(f"✅ Registered: {cmd_name}")
                 
