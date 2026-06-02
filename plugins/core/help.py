@@ -1,56 +1,123 @@
 """
 ⚛️  Help Command for AllAtomic Userbot
-Shows available commands with purple anime theme
+Shows all available commands with categories
 """
 
 import asyncio
-from telethon import events
-
-from plugins import atomic_command, get_all_commands, get_commands_by_category
+from plugins import atomic_command
 from app.utils import get_kaomoji, THEME
 
 # Plugin metadata
 __plugin__ = {
     "name": "Help",
-    "description": "Show available commands",
+    "description": "Show all available commands",
     "category": "core"
 }
 
-# Help menu template
-HELP_HEADER = """
+# Command categories
+COMMAND_CATEGORIES = {
+    "core": {
+        "name": "⚙️ Core",
+        "emoji": "⚙️",
+        "commands": ["alive", "status", "ping", "help", "cmds", "repo", "support"]
+    },
+    "admin": {
+        "name": "👥 Admin",
+        "emoji": "👥",
+        "commands": ["ban", "kick", "mute", "unmute", "purge", "pin", "unpin", "lock", "unlock", "zombies"]
+    },
+    "fun": {
+        "name": "🎮 Fun",
+        "emoji": "🎮",
+        "commands": ["meme", "joke", "tts", "fact", "quote", "roll", "coin"]
+    },
+    "utility": {
+        "name": "🔧 Utility",
+        "emoji": "🔧",
+        "commands": ["tr", "weather", "readmore", "glitch", "font", "paste", "gitinfo", "qr", "remind"]
+    },
+    "media": {
+        "name": "📷 Media",
+        "emoji": "📷",
+        "commands": ["song", "video", "insta", "tiktok", "twitter", "facebook", "media", "yt"]
+    },
+    "stickers": {
+        "name": "🎭 Stickers",
+        "emoji": "🎭",
+        "commands": ["kang", "sticker", "fullpp", "dp"]
+    },
+    "anime": {
+        "name": "🌸 Anime",
+        "emoji": "🌸",
+        "commands": ["waifu", "neko", "waifupic", "anime", "manga"]
+    },
+    "ai": {
+        "name": "🤖 AI",
+        "emoji": "🤖",
+        "commands": ["chat", "ask", "summarize"]
+    },
+    "group": {
+        "name": "📢 Group",
+        "emoji": "📢",
+        "commands": ["save", "get", "notes", "clear", "filter", "filters", "stop"]
+    },
+    "advanced": {
+        "name": "⚡ Advanced",
+        "emoji": "⚡",
+        "commands": ["eval", "exec", "term", "sudo", "heroku", "gcast"]
+    },
+    "pm": {
+        "name": "📩 PM Permit",
+        "emoji": "📩",
+        "commands": ["pmpermit", "approve", "disapprove", "block", "unblock", "logger"]
+    },
+    "voice": {
+        "name": "🎵 Voice Chat",
+        "emoji": "🎵",
+        "commands": ["vcstart", "vcend", "nowplaying", "lastfm", "play"]
+    },
+    "direct": {
+        "name": "🔗 Direct Links",
+        "emoji": "🔗",
+        "commands": ["direct", "source"]
+    }
+}
+
+HELP_TEXT = """
 ╔═══════════════════════════════════════════════╗
-║     ⚛️  **AllAtomic Help Menu**  ⚛️           ║
+║      ⚛️  **AllAtomic Help Menu**  ⚛️           ║
 ╠═══════════════════════════════════════════════╣
 ║                                               ║
-║  💜 Welcome to AllAtomic Userbot!             ║
-║  🌸 Purple Anime Theme Edition                ║
+║  💜 **Total Commands:** `{total}`             ║
+║  📦 **Plugins:** `{plugins}`                  ║
+║  🌸 **Theme:** Purple Anime                   ║
+║                                               ║
+║  **Prefix:** `.` (dot)                        ║
+║  **Example:** `.alive`, `.help`               ║
+║                                               ║
+║  {kaomoji}                                    ║
+║                                               ║
+║  **Dev:** @GhostMarshal                       ║
+║  **Channel:** @ComputeCode                    ║
+║  **Repo:** github.com/corruptcrew/AllAtomic   ║
 ║                                               ║
 ╚═══════════════════════════════════════════════╝
 
-**Available Categories:**
+**📂 Categories:**
+{categories}
+
+**💡 Tip:** Use `.help <category>` for specific commands!
 """
 
-HELP_FOOTER = """
-━━━━━━━━━━━━━━━━━━━━━━
-
-💜 **Dev:** @GhostMarshal
-📢 **Channel:** @ComputeCode
-{kaomoji}
-
-**Usage:** `.help <category>`
-**Example:** `.help core`
+CATEGORY_HELP = """
+╔═══════════════════════════════════════════════╗
+║      📂  **{category_name}**  📂               ║
+╠═══════════════════════════════════════════════╣
+║                                               ║
+{commands}
+║                                               ║
+╚═══════════════════════════════════════════════╝
 """
-
-# Categories with emojis
-CATEGORIES = {
-    "core": "⚛️  Core",
-    "group": "👥 Group",
-    "pm": "💬 PM",
-    "media": "🎬 Media",
-    "ai": "🤖 AI",
-    "anime": "🌸 Anime",
-    "utility": "🔧 Utility"
-}
 
 @atomic_command(
     "help",
@@ -61,177 +128,83 @@ CATEGORIES = {
 )
 async def help_handler(event):
     """Help command handler"""
+    from app import client
+    
     # Get category if specified
     category = event.pattern_match.group(1).strip().lower() if event.pattern_match.group(1) else None
     
-    if category:
-        # Show commands for specific category
-        await show_category_help(event, category)
-    else:
-        # Show all categories
-        await show_main_help(event)
-
-async def show_main_help(event):
-    """Show main help menu with categories"""
-    all_commands = get_all_commands()
-    
-    # Group commands by category
-    categories_dict = {}
-    for cmd in all_commands:
-        cat = cmd.get("category", "misc")
-        if cat not in categories_dict:
-            categories_dict[cat] = []
-        categories_dict[cat].append(cmd)
-    
-    # Build help message
-    help_msg = HELP_HEADER
-    
-    for cat_name, cat_display in CATEGORIES.items():
-        if cat_name in categories_dict:
-            cmd_count = len(categories_dict[cat_name])
-            help_msg += f"\n{cat_display} — `{cmd_count}` commands"
-    
-    help_msg += HELP_FOOTER.format(kaomoji=get_kaomoji("happy"))
-    
-    await event.edit(help_msg, parse_mode="md", link_preview=False)
-
-async def show_category_help(event, category: str):
-    """Show help for specific category"""
-    commands = get_commands_by_category(category)
-    
-    if not commands:
-        # Try to find by partial match
-        for cat in CATEGORIES.keys():
-            if category in cat:
-                commands = get_commands_by_category(cat)
-                break
-    
-    if not commands:
-        await event.edit(f"❌ No commands found for category: `{category}`")
-        return
-    
-    category_name = CATEGORIES.get(category, category.title())
-    
-    help_msg = f"""
-╔═══════════════════════════════════════════════╗
-║  {category_name} Commands                     ║
-╚═══════════════════════════════════════════════╝
-
-"""
-    
-    for cmd in commands:
-        cmd_name = cmd.get("name", "unknown")
-        cmd_help = cmd.get("help", "No description")
-        cmd_usage = cmd.get("usage", f".{cmd_name}")
+    if category and category in COMMAND_CATEGORIES:
+        # Show specific category help
+        cat_info = COMMAND_CATEGORIES[category]
+        commands_list = "\n".join([f"║  • `.{cmd}`" for cmd in cat_info["commands"]])
         
-        help_msg += f"⚡ **{cmd_usage}**\n"
-        help_msg += f"   └─ {cmd_help}\n\n"
+        help_msg = CATEGORY_HELP.format(
+            category_name=cat_info["name"],
+            commands=commands_list
+        )
+        
+        await event.respond(help_msg, parse_mode="md")
+    else:
+        # Show main help menu
+        categories_text = ""
+        for cat_key, cat_info in COMMAND_CATEGORIES.items():
+            cmd_count = len(cat_info["commands"])
+            categories_text += f"  {cat_info['emoji']} **{cat_info['name'][4:]}:** `{cmd_count}` commands\n"
+        
+        help_msg = HELP_TEXT.format(
+            total=85,
+            plugins=19,
+            kaomoji=get_kaomoji("happy"),
+            categories=categories_text
+        )
+        
+        await event.respond(help_msg, parse_mode="md")
     
-    help_msg += f"{'━' * 40}\n"
-    help_msg += f"💜 Total: `{len(commands)}` commands\n"
-    help_msg += f"{get_kaomoji('happy')}"
-    
-    await event.edit(help_msg, parse_mode="md", link_preview=False)
+    # Delete command message
+    await asyncio.sleep(5)
+    await event.delete()
 
 @atomic_command(
     "cmds",
     pattern=r"\.cmds",
-    help="Quick command list",
+    help="List all commands",
     usage=".cmds",
     category="core"
 )
 async def cmds_handler(event):
-    """Quick command list"""
-    all_commands = get_all_commands()
+    """List all commands"""
+    all_commands = []
+    for cat_info in COMMAND_CATEGORIES.values():
+        all_commands.extend(cat_info["commands"])
     
-    cmd_list = ", ".join([f".{cmd['name']}" for cmd in all_commands[:20]])
+    cmds_text = "\n".join([f"`.{cmd}`" for cmd in sorted(all_commands)])
     
-    if len(all_commands) > 20:
-        cmd_list += f"... and {len(all_commands) - 20} more"
-    
-    cmds_msg = f"""
-⚛️ **AllAtomic Commands** {get_kaomoji('cool')}
+    msg = f"""
+╔═══════════════════════════════════════════════╗
+║      📜  **All Commands ({len(all_commands)})**  📜     ║
+╠═══════════════════════════════════════════════╣
+║                                               ║
+{cmds_text}
+║                                               ║
+╚═══════════════════════════════════════════════╝
 
-{cmd_list}
-
-━━━━━━━━━━━━━━━━━━━━━━
-
-💜 Use `.help` for details
-📢 @ComputeCode
-    """
+**💡 Tip:** Use `.help <category>` for categorized help!
+"""
     
-    await event.edit(cmds_msg, parse_mode="md")
-    await asyncio.sleep(60)
+    await event.respond(msg, parse_mode="md")
+    await asyncio.sleep(10)
     await event.delete()
-
-@atomic_command(
-    "repo",
-    pattern=r"\.repo",
-    help="Get repository link",
-    usage=".repo",
-    category="core"
-)
-async def repo_handler(event):
-    """Show repository link"""
-    repo_msg = f"""
-⚛️ **AllAtomic Repository** {get_kaomoji('excited')}
-
-━━━━━━━━━━━━━━━━━━━━━━
-
-📦 **Source:** [GitHub](https://github.com/GhostMarshal/AllAtomic)
-💜 **Dev:** @GhostMarshal
-📢 **Channel:** @ComputeCode
-
-🌟 Star the repo if you like it!
-{get_kaomoji('love')}
-    """
-    
-    await event.edit(repo_msg, parse_mode="md", link_preview=False)
-
-@atomic_command(
-    "support",
-    pattern=r"\.support",
-    help="Get support group link",
-    usage=".support",
-    category="core"
-)
-async def support_handler(event):
-    """Show support group link"""
-    support_msg = f"""
-💜 **AllAtomic Support** {get_kaomoji('happy')}
-
-━━━━━━━━━━━━━━━━━━━━━━
-
-📢 **Channel:** [@ComputeCode](https://t.me/ComputeCode)
-💬 **Support:** [@ComputeCode](https://t.me/ComputeCode)
-👤 **Dev:** [@GhostMarshal](https://t.me/GhostMarshal)
-
-Join for updates and help!
-⚛️
-    """
-    
-    await event.edit(support_msg, parse_mode="md", link_preview=False)
 
 # Commands registry
 commands = {
     "help": {
-        "help": "Show help menu",
+        "help": "Show help menu with all commands",
         "usage": ".help [category]",
         "category": "core"
     },
     "cmds": {
-        "help": "Quick command list",
+        "help": "List all commands",
         "usage": ".cmds",
-        "category": "core"
-    },
-    "repo": {
-        "help": "Get repository link",
-        "usage": ".repo",
-        "category": "core"
-    },
-    "support": {
-        "help": "Get support group link",
-        "usage": ".support",
         "category": "core"
     }
 }
