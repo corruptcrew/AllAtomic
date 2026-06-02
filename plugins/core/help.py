@@ -5,6 +5,7 @@ Replicates HellBot's inline keyboard help system with categories
 
 import asyncio
 from telethon.tl.custom import Button
+from telethon.tl.types import InlineKeyboardMarkup, InlineKeyboardButton
 from plugins import atomic_command, REGISTERED_PLUGINS
 from app.utils import get_kaomoji, THEME
 
@@ -98,46 +99,38 @@ HELP_TEXT = """
 """
 
 
-def build_category_buttons():
-    """Build inline keyboard buttons for all categories (HellBot style)"""
-    buttons = []
+def build_inline_keyboard():
+    """Build inline keyboard using Telethon's InlineKeyboardMarkup"""
+    keyboard = []
     category_items = list(HELP_CATEGORIES.items())
     
     # Create rows of 2 buttons each (HellBot style)
     for i in range(0, len(category_items), 2):
         row = []
         cat1_name, cat1_data = category_items[i]
-        # Ensure cat1_data is a dict before accessing
-        if isinstance(cat1_data, dict):
-            emoji = cat1_data.get("emoji", "📦")
-        else:
-            emoji = "📦"
-        row.append(Button.inline(
-            f"{emoji} {cat1_name}",
-            data=f"help_cat_{cat1_name}"
+        emoji = cat1_data.get("emoji", "📦") if isinstance(cat1_data, dict) else "📦"
+        row.append(InlineKeyboardButton(
+            text=f"{emoji} {cat1_name}",
+            callback_data=f"help_cat_{cat1_name}"
         ))
         
         if i + 1 < len(category_items):
             cat2_name, cat2_data = category_items[i + 1]
-            # Ensure cat2_data is a dict before accessing
-            if isinstance(cat2_data, dict):
-                emoji = cat2_data.get("emoji", "📦")
-            else:
-                emoji = "📦"
-            row.append(Button.inline(
-                f"{emoji} {cat2_name}",
-                data=f"help_cat_{cat2_name}"
+            emoji = cat2_data.get("emoji", "📦") if isinstance(cat2_data, dict) else "📦"
+            row.append(InlineKeyboardButton(
+                text=f"{emoji} {cat2_name}",
+                callback_data=f"help_cat_{cat2_name}"
             ))
         
-        buttons.append(row)
+        keyboard.append(row)
     
     # Add navigation buttons
-    buttons.append([
-        Button.url("👥 Support", "https://t.me/ComputeCode"),
-        Button.url("📦 GitHub", "https://github.com/corruptcrew/AllAtomic"),
+    keyboard.append([
+        InlineKeyboardButton(text="👥 Support", url="https://t.me/ComputeCode"),
+        InlineKeyboardButton(text="📦 GitHub", url="https://github.com/corruptcrew/AllAtomic"),
     ])
     
-    return buttons
+    return InlineKeyboardMarkup(keyboard)
 
 
 @atomic_command(
@@ -172,11 +165,11 @@ async def help_handler(event):
             plugins=num_plugins
         )
         
-        # Build inline keyboard (HellBot style)
-        buttons = build_category_buttons()
+        # Build inline keyboard
+        keyboard = build_inline_keyboard()
         
-        # Send message with inline buttons
-        await event.respond(msg, parse_mode="md", buttons=buttons)
+        # Send message with inline keyboard using reply_markup
+        await event.respond(msg, parse_mode="md", reply_markup=keyboard)
         
     except Exception as e:
         await event.respond(f"❌ Error: {e}")
@@ -206,11 +199,9 @@ async def cmds_handler(event):
 ╚═══════════════════════════════════════════════╝
 """
         
-        buttons = [
-            [Button.inline("📂 Open Help Menu", data="help_back")],
-        ]
+        keyboard = build_inline_keyboard()
         
-        await event.respond(msg, parse_mode="md", buttons=buttons)
+        await event.respond(msg, parse_mode="md", reply_markup=keyboard)
         
     except Exception as e:
         await event.respond(f"❌ Error: {e}")
