@@ -1,98 +1,51 @@
-# AllAtomic Userbot - Requirements
+# AllAtomic Userbot - Core Requirements
 
 # Core
-telethon==1.34.0
-cryptg==0.4.0
-tgcrypto==1.2.5
+telethon>=1.34.0
+tgcrypto>=1.2.5
 
 # Database
-sqlalchemy==2.0.23
-psycopg2-binary==2.9.9
-alembic==1.13.1
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+aiosqlite>=0.19.0
 
 # Async
-aiohttp==3.9.1
-asyncio==3.4.3
-aiosqlite==0.19.0
+aiohttp>=3.9.0
 
 # Media
-yt-dlp==2023.12.30
-pydub==0.25.1
-Pillow==10.2.0
-opencv-python-headless==4.9.0.80
-requests==2.31.0
+yt-dlp>=2023.12.0
+Pillow>=10.0.0
+pydub>=0.25.0
 
 # Web
-beautifulsoup4==4.12.3
-lxml==5.1.0
-html2text==2020.1.16
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+lxml>=5.0.0
 
 # API Clients
-openai==1.10.0
-googletrans==4.0.0-rc1
-pytube==15.0.0
-instaloader==4.10.1
-spotipy==2.23.0
+openai>=1.10.0
+pytube>=15.0.0
+spotipy>=2.23.0
 
 # Utilities
-python-dotenv==1.0.0
-qrcode==7.4.2
-pyqrcode==1.2.1
-pypng==0.20220715.0
-gtts==2.5.0
-pytz==2023.3
-python-dateutil==2.8.2
-
-# Image Processing
-google-cloud-translate==3.15.1
-removebg==0.4
-wand==0.6.11
+python-dotenv>=1.0.0
+qrcode>=7.4.0
+gtts>=2.5.0
+pytz>=2023.3
+emoji>=2.10.0
 
 # Music & Voice
-py-tgcalls==1.2.9
-ntgcalls==1.0.7
-
-# Compression
-pyzipper==0.3.6
-rarfile==4.1
+py-tgcalls>=1.2.9
+ntgcalls>=1.0.7
 
 # Utilities
-jotquote==0.9.4
-faker==21.0.0
-emoji==2.10.1
-hachoir==3.3.0
-natsort==8.4.0
-
-# Web scraping
-selenium==4.16.0
-webdriver-manager==4.0.1
-
-# Extra
-heroku3==5.1.5
-gitpython==3.1.41
-speedtest-cli==2.1.3
-coffeehouse==2.2.5
-lyricsgenius==3.0.1
-youtube-search==2.1.2
-youtube-search-python==1.6.6
-
-# Anime
-jikanpy==4.3.2
-animenewsnetwork==0.2.0
-
-# Fun
-nekos.py==1.1.0
+faker>=21.0.0
+natsort>=8.4.0
+hachoir>=3.3.0
 
 # Development
-black==23.12.1
-flake8==7.0.0
-pylint==3.0.3
-pytest==7.4.4
-
-# Logging
-colorama==0.4.6
-loguru==0.7.2
+loguru>=0.7.0
+colorama>=0.4.0
 
 # Security
-cryptography==41.0.7
-pycryptodome==3.20.0
+cryptography>=41.0.0
