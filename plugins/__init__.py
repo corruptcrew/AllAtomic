@@ -47,16 +47,6 @@ def register_handler(event_type=events.NewMessage, **kwargs):
         return func
     return decorator
 
-def register_command(cmd_info: dict, client):
-    """Register a command with the client"""
-    func = cmd_info["function"]
-    pattern = cmd_info.get("pattern")
-    group = cmd_info.get("group", 0)
-    kwargs = cmd_info.get("kwargs", {})
-    
-    event = events.NewMessage(pattern=pattern, **kwargs)
-    client.add_handler(func, event=event, group=group)
-
 def load_all_plugins(client, config: Config) -> int:
     """Load all plugins from plugins/ directory"""
     plugins_dir = Path(__file__).parent.parent / "plugins"
@@ -110,13 +100,13 @@ def load_all_plugins(client, config: Config) -> int:
                 pattern = cmd_info.get("pattern", f"\\.{cmd_name}")
                 group = cmd_info.get("group", 0)
                 
-                # Register command with client using the correct Telethon API
-                @events.NewMessage(pattern=pattern)
-                async def handler(event, func=cmd_info["function"]):
-                    await func(event)
+                # Create the event filter correctly
+                event_filter = events.NewMessage(pattern=pattern)
                 
-                client.add_handler(handler, group=group)
+                # Register with client using add_handler
+                client.add_handler(cmd_info["function"], event_filter)
                 loaded_count += 1
+                logger.debug(f"✅ Registered: {cmd_name}")
                 
             except Exception as e:
                 logger.error(f"❌ Failed to register {cmd_name}: {e}")
