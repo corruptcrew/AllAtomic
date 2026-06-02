@@ -1,104 +1,50 @@
 """
-⚛️  Callback Query Handler for AllAtomic Userbot
-HellBot-style inline button callback processor
+🔘 Callback Handler for AllAtomic Userbot
+Handles inline button callbacks (HellBot-style help menu)
 """
 
-import asyncio
 from telethon import events
-from telethon.tl.custom import Button
 from plugins import register_handler
 from app.utils import get_kaomoji
-from app.logger import logger
 
 # Plugin metadata
 __plugin__ = {
     "name": "Callback Handler",
-    "description": "Handle inline button callbacks for help menu",
+    "description": "Handles inline button callbacks for help menu",
     "category": "core"
 }
 
-# Command categories (same as help.py)
+# Help categories (must match help.py)
 HELP_CATEGORIES = {
-    'core': {
-        'name': '⚙️ Core',
-        'emoji': '⚙️',
-        'commands': ['alive', 'status', 'ping', 'help', 'cmds', 'repo', 'support']
-    },
-    'admin': {
-        'name': '👥 Admin',
-        'emoji': '👥',
-        'commands': ['ban', 'kick', 'mute', 'unmute', 'purge', 'pin', 'unpin', 'lock', 'unlock', 'zombies']
-    },
-    'fun': {
-        'name': '🎮 Fun',
-        'emoji': '🎮',
-        'commands': ['meme', 'joke', 'tts', 'fact', 'quote', 'roll', 'coin']
-    },
-    'utility': {
-        'name': '🔧 Utility',
-        'emoji': '🔧',
-        'commands': ['tr', 'weather', 'readmore', 'glitch', 'font', 'paste', 'gitinfo', 'qr', 'remind']
-    },
-    'media': {
-        'name': '📷 Media',
-        'emoji': '📷',
-        'commands': ['song', 'video', 'insta', 'tiktok', 'twitter', 'facebook', 'media', 'yt']
-    },
-    'stickers': {
-        'name': '🎭 Stickers',
-        'emoji': '🎭',
-        'commands': ['kang', 'sticker', 'fullpp', 'dp']
-    },
-    'anime': {
-        'name': '🌸 Anime',
-        'emoji': '🌸',
-        'commands': ['waifu', 'neko', 'waifupic', 'anime', 'manga']
-    },
-    'ai': {
-        'name': '🤖 AI',
-        'emoji': '🤖',
-        'commands': ['chat', 'ask', 'summarize']
-    },
-    'group': {
-        'name': '📢 Group',
-        'emoji': '📢',
-        'commands': ['save', 'get', 'notes', 'clear', 'filter', 'filters', 'stop']
-    },
-    'advanced': {
-        'name': '⚡ Advanced',
-        'emoji': '⚡',
-        'commands': ['eval', 'exec', 'term', 'sudo', 'heroku', 'gcast']
-    },
-    'pm': {
-        'name': '📩 PM Permit',
-        'emoji': '📩',
-        'commands': ['pmpermit', 'approve', 'disapprove', 'block', 'unblock', 'logger']
-    },
-    'voice': {
-        'name': '🎵 Voice',
-        'emoji': '🎵',
-        'commands': ['vcstart', 'vcend', 'nowplaying', 'lastfm', 'play']
-    },
-    'direct': {
-        'name': '🔗 Direct',
-        'emoji': '🔗',
-        'commands': ['direct', 'source']
-    }
+    "Core": {"emoji": "⚙️", "commands": ["alive", "ping", "help", "cmds", "settings", "repo", "support"]},
+    "Admin": {"emoji": "👥", "commands": ["ban", "kick", "mute", "unmute", "pin", "unpin", "del", "purge"]},
+    "Fun": {"emoji": "🎮", "commands": ["joke", "meme", "quote", "love", "rate", "emoji"]},
+    "Utility": {"emoji": "🔧", "commands": ["weather", "time", "date", "info", "userid", "chatid"]},
+    "Media": {"emoji": "📷", "commands": ["dl", "upload", "tts", "sticker", "kang"]},
+    "Stickers": {"emoji": "🎭", "commands": ["kang", "sticker", "fullpp", "dp", "emoji"]},
+    "Anime": {"emoji": "🌸", "commands": ["waifu", "neko", "waifupic", "anime", "manga"]},
+    "AI": {"emoji": "🤖", "commands": ["ai", "chat", "ask", "gpt"]},
+    "Group": {"emoji": "📢", "commands": ["welcome", "goodbye", "notes", "gcast", "gdel"]},
+    "Advanced": {"emoji": "⚡", "commands": ["eval", "exec", "term", "sudo", "heroku"]},
+    "PM Permit": {"emoji": "📩", "commands": ["pmpermit", "approve", "disapprove", "block", "unblock"]},
+    "Voice": {"emoji": "🎵", "commands": ["play", "pause", "resume", "stop", "skip", "queue"]},
+    "Direct": {"emoji": "🔗", "commands": ["direct", "source", "github", "link"]}
 }
 
+# Main help menu text
 HELP_MAIN_TEXT = """
 ╔═══════════════════════════════════════════════╗
-║      ⚛️  **AllAtomic Help Menu**  ⚛️           ║
+║      ⚛️  AllAtomic Help Menu  ⚛️               ║
 ╠═══════════════════════════════════════════════╣
 ║                                               ║
-║  💜 **Total Commands:** `83`                  ║
-║  📦 **Plugins:** `19`                         ║
+║  💜 **Total Commands:** 84                    ║
+║  📦 **Plugins:** 20                           ║
 ║  🌸 **Theme:** Purple Anime                   ║
 ║                                               ║
 ║  **Prefix:** `.` (dot)                        ║
 ║  **Example:** `.alive`, `.help`               ║
 ║                                               ║
-║  {kaomoji}                                    ║
+║  (૮๑•̀ㅁ•́ฅა)                                   ║
 ║                                               ║
 ║  **Dev:** @GhostMarshal                       ║
 ║  **Channel:** @ComputeCode                    ║
@@ -108,150 +54,91 @@ HELP_MAIN_TEXT = """
 **📂 Select a category below:**
 """
 
-HELP_CATEGORY_TEXT = """
-╔═══════════════════════════════════════════════╗
-║      {category_emoji}  **{category_name}**  {category_emoji}       ║
-╠═══════════════════════════════════════════════╣
-║                                               ║
-{commands_list}
-║                                               ║
-╚═══════════════════════════════════════════════╝
 
-**💡 Usage:** `.{command}`
-"""
+def build_category_buttons():
+    """Build inline keyboard buttons for all categories"""
+    from telethon.tl.custom import Button
+    buttons = []
+    category_items = list(HELP_CATEGORIES.items())
+    
+    # Create rows of 2 buttons each
+    for i in range(0, len(category_items), 2):
+        row = []
+        cat1_name, cat1_data = category_items[i]
+        row.append(Button.inline(f"{cat1_data['emoji']} {cat1_name}", data=f"help_cat_{cat1_name}"))
+        
+        if i + 1 < len(category_items):
+            cat2_name, cat2_data = category_items[i + 1]
+            row.append(Button.inline(f"{cat2_data['emoji']} {cat2_name}", data=f"help_cat_{cat2_name}"))
+        buttons.append(row)
+    
+    # Add navigation buttons
+    buttons.append([
+        Button.url("👥 Support", "https://t.me/ComputeCode"),
+        Button.url("📦 GitHub", "https://github.com/corruptcrew/AllAtomic"),
+    ])
+    
+    return buttons
 
-ALL_COMMANDS_TEXT = """
-╔═══════════════════════════════════════════════╗
-║      📜  **All Commands ({total})**  📜          ║
-╠═══════════════════════════════════════════════╣
-║                                               ║
-{all_commands}
-║                                               ║
-╚═══════════════════════════════════════════════╝
 
-**💡 Tip:** Use the buttons below for categorized help!
-"""
-
-def build_main_keyboard():
-    """Build main help keyboard"""
+def build_back_buttons():
+    """Build back/close buttons"""
+    from telethon.tl.custom import Button
     return [
-        [
-            Button.inline('⚙️ Core', data=b'help_core'),
-            Button.inline('👥 Admin', data=b'help_admin'),
-        ],
-        [
-            Button.inline('🎮 Fun', data=b'help_fun'),
-            Button.inline('🔧 Utility', data=b'help_utility'),
-        ],
-        [
-            Button.inline('📷 Media', data=b'help_media'),
-            Button.inline('🎭 Stickers', data=b'help_stickers'),
-        ],
-        [
-            Button.inline('🌸 Anime', data=b'help_anime'),
-            Button.inline('🤖 AI', data=b'help_ai'),
-        ],
-        [
-            Button.inline('📢 Group', data=b'help_group'),
-            Button.inline('⚡ Advanced', data=b'help_advanced'),
-        ],
-        [
-            Button.inline('📩 PM Permit', data=b'help_pm'),
-            Button.inline('🎵 Voice', data=b'help_voice'),
-        ],
-        [
-            Button.inline('🔗 Direct', data=b'help_direct'),
-            Button.inline('📜 All Commands', data=b'help_all'),
-        ],
-        [
-            Button.inline('🔄 Refresh', data=b'help_refresh'),
-            Button.inline('❌ Close', data=b'help_close'),
-        ],
+        [Button.inline("◀️ Back", data="help_back")],
+        [Button.inline("❌ Close", data="help_close")],
     ]
 
-def build_back_keyboard():
-    """Build back button keyboard"""
-    return [
-        [
-            Button.inline('◀️ Back', data=b'help_main'),
-            Button.inline('🔄 Refresh', data=b'help_refresh'),
-        ],
-        [
-            Button.inline('❌ Close', data=b'help_close'),
-        ],
-    ]
 
-@register_handler(events.CallbackQuery, data=lambda d: d.startswith(b'help_'))
+@register_handler(events.CallbackQuery)
 async def help_callback_handler(event):
-    """Handle help menu callback queries - HellBot style"""
+    """Handle help menu callback queries (HellBot style)"""
     try:
         data = event.data.decode('utf-8')
-        action = data.replace('help_', '')
         
-        logger.info(f"🔘 Callback received: {action}")
+        # Handle main help menu back button
+        if data == "help_back":
+            await event.edit(HELP_MAIN_TEXT, buttons=build_category_buttons())
+            await event.answer()
         
-        if action == 'main':
-            # Show main menu
-            await event.edit(
-                HELP_MAIN_TEXT.format(kaomoji=get_kaomoji("happy")),
-                parse_mode="md",
-                buttons=build_main_keyboard()
-            )
-        
-        elif action == 'close':
-            # Close the menu
+        # Handle close button
+        elif data == "help_close":
             await event.delete()
+            await event.answer("Help menu closed", alert=True)
         
-        elif action == 'refresh':
-            # Refresh current view - re-send main menu
-            await event.edit(
-                HELP_MAIN_TEXT.format(kaomoji=get_kaomoji("happy")),
-                parse_mode="md",
-                buttons=build_main_keyboard()
-            )
-        
-        elif action == 'all':
-            # Show all commands
-            all_commands = []
-            for cat_info in HELP_CATEGORIES.values():
-                for cmd in cat_info["commands"]:
-                    all_commands.append(f"`.{cmd}`")
+        # Handle category selection
+        elif data.startswith("help_cat_"):
+            category_name = data.replace("help_cat_", "")
+            cat_data = HELP_CATEGORIES.get(category_name, {})
             
-            cmds_text = "  " + "  ".join(all_commands)
-            
-            await event.edit(
-                ALL_COMMANDS_TEXT.format(
-                    total=len(all_commands),
-                    all_commands=cmds_text
-                ),
-                parse_mode="md",
-                buttons=build_back_keyboard()
-            )
-        
-        elif action in HELP_CATEGORIES:
-            # Show category help
-            cat_info = HELP_CATEGORIES[action]
-            commands_list = "\n".join([f"║  • `.{cmd}`" for cmd in cat_info["commands"]])
-            
-            emoji = cat_info["emoji"]
-            name = cat_info["name"].split(' ', 1)[1] if ' ' in cat_info["name"] else cat_info["name"]
-            
-            await event.edit(
-                HELP_CATEGORY_TEXT.format(
-                    category_emoji=emoji,
-                    category_name=name,
-                    commands_list=commands_list
-                ),
-                parse_mode="md",
-                buttons=build_back_keyboard()
-            )
-        
-        # Answer callback query to remove loading state
-        await event.answer()
+            if cat_data:
+                emoji = cat_data.get("emoji", "📦")
+                commands = cat_data.get("commands", [])
+                
+                # Format commands list
+                cmd_list = "\n".join([f"║  •  `.{cmd}`" for cmd in commands])
+                
+                # Build category message
+                msg = f"""
+╔═══════════════════════════════════════════════╗
+║  {emoji}  {category_name} Commands  {emoji}            ║
+╠═══════════════════════════════════════════════╣
+║                                               ║
+{cmd_list}
+║                                               ║
+╚═══════════════════════════════════════════════╝
+
+**📂 Select another category:**
+"""
+                # Build buttons with back button
+                buttons = build_back_buttons()
+                
+                await event.edit(msg, parse_mode="md", buttons=buttons)
+                await event.answer(f"{category_name} commands", alert=False)
         
     except Exception as e:
-        logger.error(f"❌ Callback error: {e}")
-        await event.answer(f"❌ Error: {e}", alert=True)
+        await event.answer(f"Error: {e}", alert=True)
 
-# Commands registry (empty - this is a handler plugin)
+
+# Commands registry
 commands = {}
