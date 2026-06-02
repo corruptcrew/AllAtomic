@@ -65,13 +65,12 @@ async def help_handler(event):
             bot=BOT_USERNAME
         )
         
-        # Build inline buttons - switch to bot
+        # Build inline buttons - link to bot
         buttons = [
             [
-                Button.switch_inline(
+                Button.url(
                     '📂 Open Help Menu',
-                    bot=BOT_USERNAME,
-                    query='help'
+                    f'https://t.me/{BOT_USERNAME}?start=help'
                 )
             ],
             [
@@ -113,10 +112,9 @@ async def cmds_handler(event):
         
         buttons = [
             [
-                Button.switch_inline(
+                Button.url(
                     '📂 Browse Commands',
-                    bot=BOT_USERNAME,
-                    query=''
+                    f'https://t.me/{BOT_USERNAME}?start=cmds'
                 )
             ],
         ]
