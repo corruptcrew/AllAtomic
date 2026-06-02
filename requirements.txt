@@ -57,7 +57,7 @@ pyzipper==0.3.6
 rarfile==4.1
 
 # Utilities
-jotquote==1.0.1
+jotquote==0.9.4
 faker==21.0.0
 emoji==2.10.1
 hachoir==3.3.0
