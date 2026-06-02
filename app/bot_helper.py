@@ -11,7 +11,8 @@ from telethon.events import NewMessage
 BOT_TOKEN = "8367355512:AAELD9UvH1E8IoTWp8EZd2eFzAo3mpZdlpc"
 
 # Create bot client
-bot_client = TelegramClient('allatomic_bot', 20828230, 'a8c7e9f5d3b1a2c4e6f8a0b2d4e6f8a0')
+# Using correct API credentials from config
+bot_client = TelegramClient('allatomic_bot', 38568281, '5dec3f281b9576f65824326f7cd984ed')
 
 async def start_bot():
     """Start the bot client"""
