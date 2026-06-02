@@ -19,6 +19,7 @@ from app.utils import get_kaomoji
 # Bot configuration
 API_ID = 20828230
 API_HASH = 'a8c7e9f5d3b1a2c4e6f8a0b2d4e6f8a0'
+BOT_TOKEN = "8367355512:AAHM0nZO3C32roFtmxOtzjJiW6fQcsx0LsQ"
 
 # Create bot client
 bot = TelegramClient('allatomic_helper_bot', API_ID, API_HASH)

@@ -8,7 +8,7 @@ from telethon.tl.custom import Button
 from telethon.events import NewMessage
 
 # Bot configuration
-BOT_TOKEN = "8367355512:AAELD9UvH1E8IoTWp8EZd2eFzAo3mpZdlpc"
+BOT_TOKEN = "8367355512:AAHM0nZO3C32roFtmxOtzjJiW6fQcsx0LsQ"
 
 # Create bot client
 # For bot authentication, we need valid API credentials
