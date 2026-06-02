@@ -9,9 +9,9 @@ import logging
 from telethon import TelegramClient, events
 from telethon.tl.custom import Button
 
-# Configuration
-API_ID = 20828230
-API_HASH = "a8c7e9f5d3b1a2c4e6f8a0b2d4e6f8a0"
+# Configuration - Using same API credentials as userbot
+API_ID = 38568281
+API_HASH = "5dec3f281b9576f65824326f7cd984ed"
 BOT_TOKEN = "8367355512:AAHM0nZO3C32roFtmxOtzjJiW6fQcsx0LsQ"
 
 # Setup logging
