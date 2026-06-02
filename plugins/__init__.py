@@ -18,14 +18,8 @@ REGISTERED_PLUGINS: Dict[str, dict] = {}
 def atomic_command(command: str, pattern: str = None, group: int = 0, **kwargs):
     """
     Decorator for registering atomic commands
-    
-    Usage:
-        @atomic_command("ping", pattern=r"\.ping")
-        async def ping_cmd(event):
-            await event.reply("Pong! 💜")
     """
     def decorator(func):
-        # Store command info
         cmd_name = command
         cmd_pattern = pattern or f"\\.{command}"
         
@@ -45,14 +39,7 @@ def atomic_command(command: str, pattern: str = None, group: int = 0, **kwargs):
     return decorator
 
 def register_handler(event_type=events.NewMessage, **kwargs):
-    """
-    Decorator for registering custom event handlers
-    
-    Usage:
-        @register_handler(pattern=r".*")
-        async def handler(event):
-            pass
-    """
+    """Decorator for registering custom event handlers"""
     def decorator(func):
         REGISTERED_PLUGINS[func.__name__] = {
             "function": func,
@@ -63,24 +50,6 @@ def register_handler(event_type=events.NewMessage, **kwargs):
         return func
     return decorator
 
-def load_plugin(module_path: str, client) -> bool:
-    """Load a single plugin module"""
-    try:
-        # Import module
-        module = importlib.import_module(module_path)
-        
-        # Register commands/handlers from module
-        if hasattr(module, "__commands__"):
-            for cmd in module.__commands__:
-                register_command(cmd, client)
-        
-        logger.debug(f"✓ Loaded plugin: {module_path}")
-        return True
-        
-    except Exception as e:
-        logger.error(f"❌ Failed to load plugin {module_path}: {e}")
-        return False
-
 def register_command(cmd_info: dict, client):
     """Register a command with the client"""
     func = cmd_info["function"]
@@ -88,18 +57,11 @@ def register_command(cmd_info: dict, client):
     group = cmd_info.get("group", 0)
     kwargs = cmd_info.get("kwargs", {})
     
-    # Create event filter
     event = events.NewMessage(pattern=pattern, **kwargs)
-    
-    # Add handler
     client.add_handler(func, event=event, group=group)
 
 def load_all_plugins(client, config: Config) -> int:
-    """
-    Load all plugins from plugins/ directory
-    
-    Returns number of loaded plugins
-    """
+    """Load all plugins from plugins/ directory"""
     plugins_dir = Path(__file__).parent.parent / "plugins"
     loaded_count = 0
     
@@ -117,12 +79,10 @@ def load_all_plugins(client, config: Config) -> int:
         if category_dir.name.startswith("__"):
             continue
         
-        # Look for Python files in category directory
         for py_file in category_dir.glob("*.py"):
             if py_file.name.startswith("__"):
                 continue
             
-            # Convert path to module path
             module_path = f"plugins.{category_dir.name}.{py_file.stem}"
             plugin_files.append(module_path)
     
@@ -131,37 +91,35 @@ def load_all_plugins(client, config: Config) -> int:
         try:
             module = importlib.import_module(module_path)
             
-            # Check for __plugin__ attribute (plugin metadata)
+            # Check for __plugin__ attribute
             if hasattr(module, "__plugin__"):
                 plugin_info = module.__plugin__
                 logger.info(f"  📦 {plugin_info.get('name', module_path)}")
             
-            # Register commands from module
+            # Register commands from module.commands registry
             if hasattr(module, "commands"):
                 for cmd_name, cmd_info in module.commands.items():
-                    cmd_info["function"] = getattr(module, cmd_name, None)
-                    if cmd_info["function"]:
-                        register_command(cmd_info, client)
+                    cmd_func = getattr(module, cmd_name, None)
+                    if cmd_func:
+                        pattern = cmd_info.get("pattern", f"\\.{cmd_name}")
+                        group = cmd_info.get("group", 0)
+                        event = events.NewMessage(pattern=pattern)
+                        client.add_handler(cmd_func, event=event, group=group)
                         loaded_count += 1
+                        logger.debug(f"✓ Registered: {cmd_name}")
             
-            # Auto-register functions with __atomic_command__ attribute
-            for attr_name in dir(module):
-                attr = getattr(module, attr_name)
-                if callable(attr) and hasattr(attr, "__atomic_command__"):
-                    cmd_name = attr.__atomic_command__
-                    REGISTERED_PLUGINS[cmd_name] = {
-                        "function": attr,
-                        "pattern": attr.__atomic_kwargs__.get("pattern", f"\\.{cmd_name}"),
-                        "group": getattr(attr, "__atomic_group__", 0),
-                        "kwargs": attr.__atomic_kwargs__,
-                    }
-                    
-                    # Register with client
-                    pattern = REGISTERED_PLUGINS[cmd_name]["pattern"]
-                    group = REGISTERED_PLUGINS[cmd_name]["group"]
-                    event = events.NewMessage(pattern=pattern)
-                    client.add_handler(attr, event=event, group=group)
-                    loaded_count += 1
+            # Register decorator-registered commands
+            for cmd_name, cmd_info in list(REGISTERED_PLUGINS.items()):
+                if cmd_info.get("function"):
+                    pattern = cmd_info.get("pattern", f"\\.{cmd_name}")
+                    group = cmd_info.get("group", 0)
+                    try:
+                        event = events.NewMessage(pattern=pattern)
+                        client.add_handler(cmd_info["function"], event=event, group=group)
+                        loaded_count += 1
+                        logger.debug(f"✓ Decorator registered: {cmd_name}")
+                    except Exception as e:
+                        logger.debug(f"⚠ Could not register {cmd_name}: {e}")
             
         except Exception as e:
             logger.error(f"❌ Error loading {module_path}: {e}")
