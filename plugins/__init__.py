@@ -110,11 +110,12 @@ def load_all_plugins(client, config: Config) -> int:
                 pattern = cmd_info.get("pattern", f"\\.{cmd_name}")
                 group = cmd_info.get("group", 0)
                 
-                # Create event filter
-                event_filter = events.NewMessage(pattern=pattern)
-                
-                # Add handler
-                client.add_handler(cmd_info["function"], event=event_filter, group=group)
+                # Register command with client using the correct Telethon API
+                client.add_handler(
+                    cmd_info["function"],
+                    events.NewMessage(pattern=pattern),
+                    group=group
+                )
                 loaded_count += 1
                 
             except Exception as e:
