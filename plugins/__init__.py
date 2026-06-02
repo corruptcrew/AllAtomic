@@ -3,7 +3,6 @@ Plugin System for AllAtomic Userbot
 Auto-discovers and loads plugins from plugins/ directory
 """
 
-import os
 import importlib
 from pathlib import Path
 from typing import List, Dict
@@ -16,9 +15,7 @@ from app.config import Config
 REGISTERED_PLUGINS: Dict[str, dict] = {}
 
 def atomic_command(command: str, pattern: str = None, group: int = 0, **kwargs):
-    """
-    Decorator for registering atomic commands
-    """
+    """Decorator for registering atomic commands"""
     def decorator(func):
         cmd_name = command
         cmd_pattern = pattern or f"\\.{command}"
@@ -86,7 +83,7 @@ def load_all_plugins(client, config: Config) -> int:
             module_path = f"plugins.{category_dir.name}.{py_file.stem}"
             plugin_files.append(module_path)
     
-    # Load each plugin
+    # Load each plugin and register commands
     for module_path in plugin_files:
         try:
             module = importlib.import_module(module_path)
@@ -96,33 +93,21 @@ def load_all_plugins(client, config: Config) -> int:
                 plugin_info = module.__plugin__
                 logger.info(f"  📦 {plugin_info.get('name', module_path)}")
             
-            # Register commands from module.commands registry
-            if hasattr(module, "commands"):
-                for cmd_name, cmd_info in module.commands.items():
-                    cmd_func = getattr(module, cmd_name, None)
-                    if cmd_func:
-                        pattern = cmd_info.get("pattern", f"\\.{cmd_name}")
-                        group = cmd_info.get("group", 0)
-                        event = events.NewMessage(pattern=pattern)
-                        client.add_handler(cmd_func, event=event, group=group)
-                        loaded_count += 1
-                        logger.debug(f"✓ Registered: {cmd_name}")
-            
-            # Register decorator-registered commands
-            for cmd_name, cmd_info in list(REGISTERED_PLUGINS.items()):
-                if cmd_info.get("function"):
-                    pattern = cmd_info.get("pattern", f"\\.{cmd_name}")
-                    group = cmd_info.get("group", 0)
-                    try:
-                        event = events.NewMessage(pattern=pattern)
-                        client.add_handler(cmd_info["function"], event=event, group=group)
-                        loaded_count += 1
-                        logger.debug(f"✓ Decorator registered: {cmd_name}")
-                    except Exception as e:
-                        logger.debug(f"⚠ Could not register {cmd_name}: {e}")
-            
         except Exception as e:
             logger.error(f"❌ Error loading {module_path}: {e}")
+    
+    # Now register all commands from REGISTERED_PLUGINS with the client
+    for cmd_name, cmd_info in REGISTERED_PLUGINS.items():
+        if cmd_info.get("function"):
+            try:
+                pattern = cmd_info.get("pattern", f"\\.{cmd_name}")
+                group = cmd_info.get("group", 0)
+                event = events.NewMessage(pattern=pattern)
+                client.add_handler(cmd_info["function"], event=event, group=group)
+                loaded_count += 1
+                logger.debug(f"✓ Registered: {cmd_name}")
+            except Exception as e:
+                logger.debug(f"⚠ Could not register {cmd_name}: {e}")
     
     logger.info(f"💜 Total commands registered: {loaded_count}")
     return loaded_count
