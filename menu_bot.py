@@ -1,27 +1,24 @@
 #!/usr/bin/env python3
 """
-AllAtomic Bot - HellBot Style Inline Menu
+AllAtomic Menu Bot - HellBot Style Inline Menu
 Separate bot for inline keyboard help menu
+Uses python-telegram-bot for reliable bot functionality
 """
 
 import asyncio
 import logging
-from telethon import TelegramClient, events
-from telethon.tl.custom import Button
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
-# Configuration - Using same API credentials as userbot
-API_ID = 38568281
-API_HASH = "5dec3f281b9576f65824326f7cd984ed"
+# Configuration
 BOT_TOKEN = "8367355512:AAHM0nZO3C32roFtmxOtzjJiW6fQcsx0LsQ"
 
 # Setup logging
 logging.basicConfig(
-    format='[%(levelname)s] %(name)s: %(message)s',
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
-
-# Create bot client
-bot = TelegramClient('allatomic_menu_bot', API_ID, API_HASH)
+logger = logging.getLogger(__name__)
 
 # Help menu text
 HELP_TEXT = """
@@ -102,64 +99,73 @@ CATEGORIES = {
     }
 }
 
-def main_menu_buttons():
+def main_menu_keyboard():
     """Build main menu inline keyboard"""
     return [
-        [Button.inline('⚙️ Core', b'help_core'), Button.inline('👥 Admin', b'help_admin')],
-        [Button.inline('🎮 Fun', b'help_fun'), Button.inline('🔧 Utility', b'help_utility')],
-        [Button.inline('📷 Media', b'help_media'), Button.inline('🎭 Stickers', b'help_stickers')],
-        [Button.inline('🌸 Anime', b'help_anime'), Button.inline('🤖 AI', b'help_ai')],
-        [Button.inline('📢 Group', b'help_group'), Button.inline('⚡ Advanced', b'help_advanced')],
-        [Button.inline('📩 PM Permit', b'help_pm'), Button.inline('🎵 Voice', b'help_voice')],
-        [Button.inline('🔗 Direct', b'help_direct'), Button.inline('📜 All Commands', b'help_all')],
-        [Button.inline('🔄 Refresh', b'help_refresh'), Button.inline('❌ Close', b'help_close')],
+        [InlineKeyboardButton('⚙️ Core', callback_data='help_core'), 
+         InlineKeyboardButton('👥 Admin', callback_data='help_admin')],
+        [InlineKeyboardButton('🎮 Fun', callback_data='help_fun'), 
+         InlineKeyboardButton('🔧 Utility', callback_data='help_utility')],
+        [InlineKeyboardButton('📷 Media', callback_data='help_media'), 
+         InlineKeyboardButton('🎭 Stickers', callback_data='help_stickers')],
+        [InlineKeyboardButton('🌸 Anime', callback_data='help_anime'), 
+         InlineKeyboardButton('🤖 AI', callback_data='help_ai')],
+        [InlineKeyboardButton('📢 Group', callback_data='help_group'), 
+         InlineKeyboardButton('⚡ Advanced', callback_data='help_advanced')],
+        [InlineKeyboardButton('📩 PM Permit', callback_data='help_pm'), 
+         InlineKeyboardButton('🎵 Voice', callback_data='help_voice')],
+        [InlineKeyboardButton('🔗 Direct', callback_data='help_direct'), 
+         InlineKeyboardButton('📜 All Commands', callback_data='help_all')],
+        [InlineKeyboardButton('🔄 Refresh', callback_data='help_refresh'), 
+         InlineKeyboardButton('❌ Close', callback_data='help_close')],
     ]
 
-def back_buttons():
+def back_keyboard():
     """Build back button keyboard"""
     return [
-        [Button.inline('◀️ Back', b'help_main'), Button.inline('🔄 Refresh', b'help_refresh')],
-        [Button.inline('❌ Close', b'help_close')],
+        [InlineKeyboardButton('◀️ Back', callback_data='help_main'), 
+         InlineKeyboardButton('🔄 Refresh', callback_data='help_refresh')],
+        [InlineKeyboardButton('❌ Close', callback_data='help_close')],
     ]
 
-@bot.on(events.NewMessage(pattern='/start'))
-async def start_handler(event):
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /start command"""
-    await event.respond(
+    await update.message.reply_text(
         HELP_TEXT,
-        parse_mode='md',
-        buttons=main_menu_buttons()
+        parse_mode='Markdown',
+        reply_markup=InlineKeyboardMarkup(main_menu_keyboard())
     )
 
-@bot.on(events.NewMessage(pattern='/help'))
-async def help_handler(event):
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /help command"""
-    await event.respond(
+    await update.message.reply_text(
         HELP_TEXT,
-        parse_mode='md',
-        buttons=main_menu_buttons()
+        parse_mode='Markdown',
+        reply_markup=InlineKeyboardMarkup(main_menu_keyboard())
     )
 
-@bot.on(events.CallbackQuery())
-async def callback_handler(event):
+async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle inline button callbacks"""
-    data = event.data.decode('utf-8')
+    query = update.callback_query
+    await query.answer()
+    
+    data = query.data
     
     if data == 'help_main':
-        await event.edit(
+        await query.edit_message_text(
             HELP_TEXT,
-            parse_mode='md',
-            buttons=main_menu_buttons()
+            parse_mode='Markdown',
+            reply_markup=InlineKeyboardMarkup(main_menu_keyboard())
         )
     
     elif data == 'help_close':
-        await event.delete()
+        await query.delete_message()
     
     elif data == 'help_refresh':
-        await event.edit(
+        await query.edit_message_text(
             HELP_TEXT,
-            parse_mode='md',
-            buttons=main_menu_buttons()
+            parse_mode='Markdown',
+            reply_markup=InlineKeyboardMarkup(main_menu_keyboard())
         )
     
     elif data == 'help_all':
@@ -169,7 +175,7 @@ async def callback_handler(event):
         
         cmds_text = '  ' + '  '.join([f'`.{cmd}`' for cmd in all_cmds])
         
-        await event.edit(
+        await query.edit_message_text(
             f"""
 ╔═══════════════════════════════════════════════╗
 ║      📜  **All Commands ({len(all_cmds)})**  📜     ║
@@ -181,8 +187,8 @@ async def callback_handler(event):
 
 **💡 Tip:** Use buttons below for categories!
 """,
-            parse_mode='md',
-            buttons=back_buttons()
+            parse_mode='Markdown',
+            reply_markup=InlineKeyboardMarkup(back_keyboard())
         )
     
     elif data.startswith('help_'):
@@ -191,7 +197,7 @@ async def callback_handler(event):
             cat = CATEGORIES[category]
             cmds_list = '\n'.join([f"║  • `.{cmd}`" for cmd in cat['commands']])
             
-            await event.edit(
+            await query.edit_message_text(
                 f"""
 ╔═══════════════════════════════════════════════╗
 ║      {cat['name']}      ║
@@ -203,20 +209,31 @@ async def callback_handler(event):
 
 **💡 Usage:** `.{cat['commands'][0]}`
 """,
-                parse_mode='md',
-                buttons=back_buttons()
+                parse_mode='Markdown',
+                reply_markup=InlineKeyboardMarkup(back_keyboard())
             )
-    
-    await event.answer()
 
-async def main():
+async def post_init(application):
+    """Called after bot initialization"""
+    bot_info = await application.bot.get_me()
+    logger.info(f'✅ Bot started: @{bot_info.username}')
+    logger.info(f'💜 AllAtomic Menu Bot is ready!')
+    logger.info(f'📱 Talk to @{bot_info.username} to use the menu')
+
+def main():
     """Main function"""
-    logging.info('⚛️  Starting AllAtomic Menu Bot...')
-    await bot.start(bot_token=BOT_TOKEN)
-    logging.info('✅ Bot started successfully!')
-    logging.info('💜 Menu bot is ready!')
-    logging.info('📱 Talk to @AllAtomicBot to use the menu')
-    await bot.run_until_disconnected()
+    logger.info('⚛️  Starting AllAtomic Menu Bot...')
+    
+    # Create application
+    application = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
+    
+    # Add handlers
+    application.add_handler(CommandHandler('start', start_command))
+    application.add_handler(CommandHandler('help', help_command))
+    application.add_handler(CallbackQueryHandler(button_callback))
+    
+    # Start the bot
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    main()
