@@ -4,6 +4,7 @@ Auto-discovers and loads plugins from plugins/ directory
 """
 
 import importlib
+import inspect
 from pathlib import Path
 from typing import List, Dict
 from telethon import events
@@ -15,7 +16,7 @@ from app.config import Config
 REGISTERED_PLUGINS: Dict[str, dict] = {}
 
 def atomic_command(command: str, pattern: str = None, group: int = 0, **kwargs):
-    """Decorator for registering atomic commands"""
+    """Decorator for registering atomic commands - stores for later registration"""
     def decorator(func):
         cmd_name = command
         cmd_pattern = pattern or f"\\.{command}"
@@ -99,12 +100,17 @@ def load_all_plugins(client, config: Config) -> int:
             try:
                 pattern = cmd_info.get("pattern", f"\\.{cmd_name}")
                 group = cmd_info.get("group", 0)
+                func = cmd_info["function"]
                 
-                # Create the event filter correctly
-                event_filter = events.NewMessage(pattern=pattern)
+                # Create wrapper that calls the original function
+                async def wrapper(event, handler_func=func):
+                    try:
+                        await handler_func(event)
+                    except Exception as e:
+                        logger.error(f"❌ Error in {cmd_name}: {e}")
                 
-                # Register with client using add_handler
-                client.add_handler(cmd_info["function"], event_filter)
+                # Use @client.on() pattern by calling on() directly
+                client.on(events.NewMessage(pattern=pattern))(wrapper)
                 loaded_count += 1
                 logger.debug(f"✅ Registered: {cmd_name}")
                 
