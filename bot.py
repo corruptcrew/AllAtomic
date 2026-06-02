@@ -6,7 +6,7 @@ Handles inline button callbacks for help menu
 
 import asyncio
 from telethon import TelegramClient, events
-from telethon.tl.custom import InlineButton
+from telethon.tl.custom import Button
 from app.bot_helper import (
     BOT_TOKEN, 
     HELP_CATEGORIES, 

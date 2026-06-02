@@ -4,7 +4,7 @@ HellBot-style menu system
 """
 
 from telethon import TelegramClient
-from telethon.tl.custom import InlineButton
+from telethon.tl.custom import Button
 from telethon.events import NewMessage
 
 # Bot configuration
@@ -22,36 +22,36 @@ def build_help_keyboard():
     """Build HellBot-style inline keyboard for help menu"""
     buttons = [
         [
-            InlineButton('⚙️ Core', data=b'help_core'),
-            InlineButton('👥 Admin', data=b'help_admin'),
+            Button.inline('⚙️ Core', data=b'help_core'),
+            Button.inline('👥 Admin', data=b'help_admin'),
         ],
         [
-            InlineButton('🎮 Fun', data=b'help_fun'),
-            InlineButton('🔧 Utility', data=b'help_utility'),
+            Button.inline('🎮 Fun', data=b'help_fun'),
+            Button.inline('🔧 Utility', data=b'help_utility'),
         ],
         [
-            InlineButton('📷 Media', data=b'help_media'),
-            InlineButton('🎭 Stickers', data=b'help_stickers'),
+            Button.inline('📷 Media', data=b'help_media'),
+            Button.inline('🎭 Stickers', data=b'help_stickers'),
         ],
         [
-            InlineButton('🌸 Anime', data=b'help_anime'),
-            InlineButton('🤖 AI', data=b'help_ai'),
+            Button.inline('🌸 Anime', data=b'help_anime'),
+            Button.inline('🤖 AI', data=b'help_ai'),
         ],
         [
-            InlineButton('📢 Group', data=b'help_group'),
-            InlineButton('⚡ Advanced', data=b'help_advanced'),
+            Button.inline('📢 Group', data=b'help_group'),
+            Button.inline('⚡ Advanced', data=b'help_advanced'),
         ],
         [
-            InlineButton('📩 PM Permit', data=b'help_pm'),
-            InlineButton('🎵 Voice', data=b'help_voice'),
+            Button.inline('📩 PM Permit', data=b'help_pm'),
+            Button.inline('🎵 Voice', data=b'help_voice'),
         ],
         [
-            InlineButton('🔗 Direct', data=b'help_direct'),
-            InlineButton('📜 All Commands', data=b'help_all'),
+            Button.inline('🔗 Direct', data=b'help_direct'),
+            Button.inline('📜 All Commands', data=b'help_all'),
         ],
         [
-            InlineButton('🔄 Refresh', data=b'help_refresh'),
-            InlineButton('❌ Close', data=b'help_close'),
+            Button.inline('🔄 Refresh', data=b'help_refresh'),
+            Button.inline('❌ Close', data=b'help_close'),
         ],
     ]
     return buttons
@@ -60,11 +60,11 @@ def build_category_keyboard(category, back_data=b'help_main'):
     """Build keyboard for specific category"""
     buttons = [
         [
-            InlineButton('◀️ Back', data=back_data),
-            InlineButton('🔄 Refresh', data=b'help_refresh'),
+            Button.inline('◀️ Back', data=back_data),
+            Button.inline('🔄 Refresh', data=b'help_refresh'),
         ],
         [
-            InlineButton('❌ Close', data=b'help_close'),
+            Button.inline('❌ Close', data=b'help_close'),
         ],
     ]
     return buttons
@@ -73,12 +73,12 @@ def build_main_menu_keyboard():
     """Build main menu keyboard (after /start)"""
     buttons = [
         [
-            InlineButton('⚛️ Help', data=b'menu_help'),
-            InlineButton('📜 Commands', data=b'menu_cmds'),
+            Button.inline('⚛️ Help', data=b'menu_help'),
+            Button.inline('📜 Commands', data=b'menu_cmds'),
         ],
         [
-            InlineButton('👤 About', data=b'menu_about'),
-            InlineButton('🔗 Repo', data=b'menu_repo'),
+            Button.inline('👤 About', data=b'menu_about'),
+            Button.inline('🔗 Repo', data=b'menu_repo'),
         ],
     ]
     return buttons
