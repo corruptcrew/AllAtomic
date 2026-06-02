@@ -101,20 +101,24 @@ def load_all_plugins(client, config: Config) -> int:
         except Exception as e:
             logger.error(f"❌ Error loading {module_path}: {e}")
     
-    logger.info(f"📊 REGISTERED_PLUGINS after imports: {list(REGISTERED_PLUGINS.keys())}")
+    logger.info(f"📊 REGISTERED_PLUGINS after imports: {len(REGISTERED_PLUGINS)} commands")
     
     # Now register all commands from REGISTERED_PLUGINS with the client
     for cmd_name, cmd_info in REGISTERED_PLUGINS.items():
-        if cmd_info.get("function"):
+        if cmd_info and "function" in cmd_info:
             try:
                 pattern = cmd_info.get("pattern", f"\\.{cmd_name}")
                 group = cmd_info.get("group", 0)
-                event = events.NewMessage(pattern=pattern)
-                client.add_handler(cmd_info["function"], event=event, group=group)
+                
+                # Create event filter
+                event_filter = events.NewMessage(pattern=pattern)
+                
+                # Add handler
+                client.add_handler(cmd_info["function"], event=event_filter, group=group)
                 loaded_count += 1
-                logger.debug(f"✓ Registered: {cmd_name}")
+                
             except Exception as e:
-                logger.debug(f"⚠ Could not register {cmd_name}: {e}")
+                logger.error(f"❌ Failed to register {cmd_name}: {e}")
     
     logger.info(f"💜 Total commands registered: {loaded_count}")
     return loaded_count
