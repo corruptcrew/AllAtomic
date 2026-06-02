@@ -7,7 +7,7 @@
 **「 I Am The Atom That Rules All 」**
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/new)
-[![Deploy to Heroku](https://www.herokucdn.com/deploy-button.svg)](https://heroku.com/deploy?template=https://github.com/corruptcrew/AllAtomic)
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/corruptcrew/AllAtomic)
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue?style=for-the-badge&logo=python)
 ![Telethon](https://img.shields.io/badge/Telethon-1.34-purple?style=for-the-badge)

@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  allatomic:
+    build: .
+    restart: unless-stopped
+    environment:
+      - APP_ID=${APP_ID}
+      - API_HASH=${API_HASH}
+      - SESSION_STRING=${SESSION_STRING}
+      - DATABASE_URL=${DATABASE_URL}
+      - BOT_TOKEN=${BOT_TOKEN}
+      - HANDLER=${HANDLER}
+      - OWNER_ID=${OWNER_ID}
+      - LOGGER_ID=${LOGGER_ID}
+    volumes:
+      - ./data:/app/data
+    networks:
+      - allatomic-net
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=allatomic
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-allatomic_password}
+      - POSTGRES_DB=allatomic
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - allatomic-net
+
+volumes:
+  postgres_data:
+
+networks:
+  allatomic-net:
+    driver: bridge

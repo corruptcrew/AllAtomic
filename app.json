@@ -2,56 +2,85 @@
   "name": "AllAtomic Userbot",
   "description": "The Ultimate Telegram Userbot - 200+ commands, group management, media downloads, and more",
   "repository": "https://github.com/corruptcrew/AllAtomic",
-  "logo": "https://raw.githubusercontent.com/corruptcrew/AllAtomic/main/assets/logo.png",
-  "keywords": ["telegram", "userbot", "telethon", "automation"],
+  "logo": "https://raw.githubusercontent.com/corruptcrew/AllAtomic/main/assets/banner.gif",
+  "keywords": ["telegram", "userbot", "telethon", "automation", "anime"],
+  "website": "https://t.me/ComputeCode",
+  "success_url": "https://t.me/ComputeCode",
   "env": {
     "API_ID": {
-      "description": "Get from my.telegram.org",
-      "required": true
+      "description": "Get this from my.telegram.org",
+      "required": true,
+      "value": ""
     },
     "API_HASH": {
-      "description": "Get from my.telegram.org",
-      "required": true
+      "description": "Get this from my.telegram.org",
+      "required": true,
+      "value": ""
     },
     "SESSION_STRING": {
-      "description": "Run generate_string_session.py to get this",
-      "required": true
+      "description": "Run generate_string_session.py or use Railway shell",
+      "required": true,
+      "value": ""
     },
     "OWNER_ID": {
-      "description": "Your Telegram ID - get from @userinfobot",
-      "required": true
+      "description": "Your Telegram User ID (get from @userinfobot)",
+      "required": true,
+      "value": ""
     },
     "DATABASE_URL": {
-      "description": "PostgreSQL URL - Heroku auto-provides this",
-      "required": true
+      "description": "Heroku Postgres auto-provides this - leave blank",
+      "required": false,
+      "value": ""
     },
     "HANDLER": {
-      "description": "Command prefix",
-      "value": ".",
-      "required": false
-    },
-    "OPENAI_API_KEY": {
-      "description": "For AI chat features (optional)",
-      "required": false
+      "description": "Command prefix for the bot",
+      "required": false,
+      "value": "."
     },
     "HEROKU_API_KEY": {
-      "description": "For Heroku commands (optional)",
-      "required": false
+      "description": "Heroku API Key (for .heroku commands)",
+      "required": false,
+      "value": ""
     },
     "HEROKU_APP_NAME": {
-      "description": "Your Heroku app name (optional)",
-      "required": false
+      "description": "Your Heroku app name (for .heroku commands)",
+      "required": false,
+      "value": ""
+    },
+    "OPENAI_API_KEY": {
+      "description": "OpenAI API Key (for AI chat features)",
+      "required": false,
+      "value": ""
+    },
+    "LOGGER_ID": {
+      "description": "Logger Channel/Group ID (optional)",
+      "required": false,
+      "value": ""
     }
   },
-  "addons": ["heroku-postgresql"],
-  "buildpacks": [
-    {"url": "heroku/python"},
-    {"url": "https://github.com/heroku/heroku-buildpack-ffmpeg"}
-  ],
   "formation": {
     "worker": {
       "quantity": 1,
       "size": "eco"
     }
-  }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql:essential-0",
+      "options": {
+        "version": "15"
+      }
+    }
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    },
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-ffmpeg#latest"
+    },
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-google-chrome#latest"
+    }
+  ]
 }
