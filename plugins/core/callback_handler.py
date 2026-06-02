@@ -4,6 +4,7 @@ Handles inline button callbacks (HellBot-style help menu)
 """
 
 from telethon import events
+from telethon.tl.custom import Button
 from plugins import register_handler
 from app.utils import get_kaomoji
 
@@ -57,7 +58,6 @@ HELP_MAIN_TEXT = """
 
 def build_category_buttons():
     """Build inline keyboard buttons for all categories"""
-    from telethon.tl.custom import Button
     buttons = []
     category_items = list(HELP_CATEGORIES.items())
     
@@ -83,7 +83,6 @@ def build_category_buttons():
 
 def build_back_buttons():
     """Build back/close buttons"""
-    from telethon.tl.custom import Button
     return [
         [Button.inline("◀️ Back", data="help_back")],
         [Button.inline("❌ Close", data="help_close")],
@@ -94,7 +93,10 @@ def build_back_buttons():
 async def help_callback_handler(event):
     """Handle help menu callback queries (HellBot style)"""
     try:
-        data = event.data.decode('utf-8')
+        # Handle callback data - event.data is already bytes
+        data = event.data
+        if isinstance(data, bytes):
+            data = data.decode('utf-8')
         
         # Handle main help menu back button
         if data == "help_back":
@@ -109,9 +111,9 @@ async def help_callback_handler(event):
         # Handle category selection
         elif data.startswith("help_cat_"):
             category_name = data.replace("help_cat_", "")
-            cat_data = HELP_CATEGORIES.get(category_name, {})
+            cat_data = HELP_CATEGORIES.get(category_name)
             
-            if cat_data:
+            if cat_data and isinstance(cat_data, dict):
                 emoji = cat_data.get("emoji", "📦")
                 commands = cat_data.get("commands", [])
                 
@@ -135,9 +137,11 @@ async def help_callback_handler(event):
                 
                 await event.edit(msg, parse_mode="md", buttons=buttons)
                 await event.answer(f"{category_name} commands", alert=False)
+            else:
+                await event.answer("Category not found", alert=True)
         
     except Exception as e:
-        await event.answer(f"Error: {e}", alert=True)
+        await event.answer(f"Error: {str(e)}", alert=True)
 
 
 # Commands registry
