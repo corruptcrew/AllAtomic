@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
 AllAtomic Menu Bot - HellBot Style Inline Menu
-Separate bot for inline keyboard help menu
-Uses python-telegram-bot for reliable bot functionality
+Supports: Commands, Inline Mode, Group Chats
+Use @AllAtomicBot in any chat for inline results
 """
 
-import asyncio
 import logging
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes, InlineQueryHandler
 
 # Configuration
 BOT_TOKEN = "8367355512:AAHM0nZO3C32roFtmxOtzjJiW6fQcsx0LsQ"
@@ -213,26 +212,78 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=InlineKeyboardMarkup(back_keyboard())
             )
 
+async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle inline queries - type @AllAtomicBot in any chat"""
+    query = update.inline_query
+    results = []
+    
+    # Main help result
+    results.append(
+        InlineQueryResultArticle(
+            id='help_main',
+            title='📂 AllAtomic Help Menu',
+            description='View all commands with inline buttons',
+            input_message_content=InputTextMessageContent(
+                HELP_TEXT,
+                parse_mode='Markdown'
+            ),
+            reply_markup=InlineKeyboardMarkup(main_menu_keyboard())
+        )
+    )
+    
+    # Add category results
+    for cat_id, cat in CATEGORIES.items():
+        cmds_list = ', '.join([f'.{cmd}' for cmd in cat['commands'][:5]])
+        if len(cat['commands']) > 5:
+            cmds_list += '...'
+        
+        results.append(
+            InlineQueryResultArticle(
+                id=f'cat_{cat_id}',
+                title=f'{cat["name"]} Commands',
+                description=f'{len(cat["commands"])} commands: {cmds_list}',
+                input_message_content=InputTextMessageContent(
+                    f"""
+╔═══════════════════════════════════════════════╗
+║      {cat['name']}      ║
+╠═══════════════════════════════════════════════╣
+║                                               ║
+{chr(10).join([f"║  • `.{cmd}`" for cmd in cat['commands']])}
+║                                               ║
+╚═══════════════════════════════════════════════╝
+
+**💡 Usage:** `.{cat['commands'][0]}`
+""",
+                    parse_mode='Markdown'
+                ),
+                reply_markup=InlineKeyboardMarkup(back_keyboard())
+            )
+        )
+    
+    await update.inline_query.answer(results, cache_time=300)
+
 async def post_init(application):
     """Called after bot initialization"""
     bot_info = await application.bot.get_me()
     logger.info(f'✅ Bot started: @{bot_info.username}')
     logger.info(f'💜 AllAtomic Menu Bot is ready!')
-    logger.info(f'📱 Talk to @{bot_info.username} to use the menu')
+    logger.info(f'📱 Use @AllAtomicBot in any chat for inline menu!')
 
 def main():
     """Main function"""
     logger.info('⚛️  Starting AllAtomic Menu Bot...')
     
-    # Create application
+    # Create application with inline mode enabled
     application = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
     
     # Add handlers
     application.add_handler(CommandHandler('start', start_command))
     application.add_handler(CommandHandler('help', help_command))
     application.add_handler(CallbackQueryHandler(button_callback))
+    application.add_handler(InlineQueryHandler(inline_query))
     
     # Start the bot
+    logger.info('🚀 Bot is running! Type @AllAtomicBot in any chat.')
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == '__main__':
