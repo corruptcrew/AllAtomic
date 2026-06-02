@@ -1,77 +1,35 @@
 """
-⚛️  HellBot-Style Help Menu for AllAtomic Userbot
-Replicates HellBot's inline keyboard help system with categories
+⚛️  Help Menu for AllAtomic Userbot
+Shows text-based help + directs to @AllAtomicBot for inline menu
 """
 
-import asyncio
-from telethon.tl.custom import Button
 from plugins import atomic_command, REGISTERED_PLUGINS
-from app.utils import get_kaomoji, THEME
 
 # Plugin metadata
 __plugin__ = {
     "name": "Help",
-    "description": "HellBot-style help menu with inline category buttons",
+    "description": "Show help menu - use @AllAtomicBot for inline buttons",
     "category": "core"
 }
 
-# Bot username for inline mode
+# Bot username for inline menu
 BOT_USERNAME = "@AllAtomicBot"
 
-# Help categories (HellBot style)
+# Help categories
 HELP_CATEGORIES = {
-    "Core": {
-        "emoji": "⚙️",
-        "commands": ["alive", "ping", "help", "cmds", "settings", "repo", "support"]
-    },
-    "Admin": {
-        "emoji": "👥",
-        "commands": ["ban", "kick", "mute", "unmute", "pin", "unpin", "del", "purge"]
-    },
-    "Fun": {
-        "emoji": "🎮",
-        "commands": ["joke", "meme", "quote", "love", "rate", "emoji"]
-    },
-    "Utility": {
-        "emoji": "🔧",
-        "commands": ["weather", "time", "date", "info", "userid", "chatid"]
-    },
-    "Media": {
-        "emoji": "📷",
-        "commands": ["dl", "upload", "tts", "sticker", "kang"]
-    },
-    "Stickers": {
-        "emoji": "🎭",
-        "commands": ["kang", "sticker", "fullpp", "dp", "emoji"]
-    },
-    "Anime": {
-        "emoji": "🌸",
-        "commands": ["waifu", "neko", "waifupic", "anime", "manga"]
-    },
-    "AI": {
-        "emoji": "🤖",
-        "commands": ["ai", "chat", "ask", "gpt"]
-    },
-    "Group": {
-        "emoji": "📢",
-        "commands": ["welcome", "goodbye", "notes", "gcast", "gdel"]
-    },
-    "Advanced": {
-        "emoji": "⚡",
-        "commands": ["eval", "exec", "term", "sudo", "heroku"]
-    },
-    "PM Permit": {
-        "emoji": "📩",
-        "commands": ["pmpermit", "approve", "disapprove", "block", "unblock"]
-    },
-    "Voice": {
-        "emoji": "🎵",
-        "commands": ["play", "pause", "resume", "stop", "skip", "queue"]
-    },
-    "Direct": {
-        "emoji": "🔗",
-        "commands": ["direct", "source", "github", "link"]
-    }
+    "Core": ["alive", "ping", "help", "cmds", "settings", "repo", "support"],
+    "Admin": ["ban", "kick", "mute", "unmute", "pin", "unpin", "del", "purge"],
+    "Fun": ["joke", "meme", "quote", "love", "rate", "emoji"],
+    "Utility": ["weather", "time", "date", "info", "userid", "chatid"],
+    "Media": ["dl", "upload", "tts", "sticker", "kang"],
+    "Stickers": ["kang", "sticker", "fullpp", "dp", "emoji"],
+    "Anime": ["waifu", "neko", "waifupic", "anime", "manga"],
+    "AI": ["ai", "chat", "ask", "gpt"],
+    "Group": ["welcome", "goodbye", "notes", "gcast", "gdel"],
+    "Advanced": ["eval", "exec", "term", "sudo", "heroku"],
+    "PM Permit": ["pmpermit", "approve", "disapprove", "block", "unblock"],
+    "Voice": ["play", "pause", "resume", "stop", "skip", "queue"],
+    "Direct": ["direct", "source", "github", "link"]
 }
 
 # Main help menu text
@@ -87,96 +45,59 @@ HELP_TEXT = """
 ║  **Prefix:** `.` (dot)                        ║
 ║  **Example:** `.alive`, `.help`               ║
 ║                                               ║
-║  (૮๑•̀ㅁ•́ฅา)                                   ║
+║  (૮๑•̀ㅁ•́ฅა)                                   ║
 ║                                               ║
 ║  **Dev:** @GhostMarshal                       ║
 ║  **Channel:** @ComputeCode                    ║
 ║                                               ║
 ╚═══════════════════════════════════════════════╝
 
-**📂 Select a category below:**
+**🤖 For INLINE BUTTON menu, use:**
+👉 `{bot}` in any chat!
+
+**📂 Command Categories:**
 """
 
 
-def build_category_buttons():
-    """Build inline keyboard buttons for all categories (HellBot style)"""
-    buttons = []
-    category_items = list(HELP_CATEGORIES.items())
-    
-    # Create rows of 2 buttons each (HellBot style)
-    for i in range(0, len(category_items), 2):
-        row = []
-        cat1_name, cat1_data = category_items[i]
-        # Ensure cat1_data is a dict before accessing
-        if isinstance(cat1_data, dict):
-            emoji = cat1_data.get("emoji", "📦")
-        else:
-            emoji = "📦"
-        row.append(Button.inline(
-            f"{emoji} {cat1_name}",
-            data=f"help_cat_{cat1_name}"
-        ))
-        
-        if i + 1 < len(category_items):
-            cat2_name, cat2_data = category_items[i + 1]
-            # Ensure cat2_data is a dict before accessing
-            if isinstance(cat2_data, dict):
-                emoji = cat2_data.get("emoji", "📦")
-            else:
-                emoji = "📦"
-            row.append(Button.inline(
-                f"{emoji} {cat2_name}",
-                data=f"help_cat_{cat2_name}"
-            ))
-        
-        buttons.append(row)
-    
-    # Add navigation buttons
-    buttons.append([
-        Button.url("👥 Support", "https://t.me/ComputeCode"),
-        Button.url("📦 GitHub", "https://github.com/corruptcrew/AllAtomic"),
-    ])
-    
-    return buttons
+def build_category_list():
+    """Build text-based category list"""
+    result = ""
+    for category, commands in HELP_CATEGORIES.items():
+        emoji = {
+            "Core": "⚙️", "Admin": "👥", "Fun": "🎮", "Utility": "🔧",
+            "Media": "📷", "Stickers": "🎭", "Anime": "🌸", "AI": "🤖",
+            "Group": "📢", "Advanced": "⚡", "PM Permit": "📩",
+            "Voice": "🎵", "Direct": "🔗"
+        }.get(category, "📦")
+        result += f"\n{emoji} **{category}:** `.{commands[0]}`, `.{commands[1]}`...\n"
+    return result
 
 
 @atomic_command(
     "help",
     pattern=r"\.help",
-    help="Show help menu with inline category buttons (HellBot style)",
+    help="Show help menu with category list",
     usage=".help",
     category="core"
 )
 async def help_handler(event):
-    """Show HellBot-style help menu with inline category buttons"""
+    """Show help menu with category list"""
     try:
-        # Get total stats - safely handle REGISTERED_PLUGINS
-        if REGISTERED_PLUGINS and isinstance(REGISTERED_PLUGINS, list):
-            # Count commands safely
-            total_commands = len(REGISTERED_PLUGINS)
-            # Count unique categories safely
-            categories = set()
-            for cmd in REGISTERED_PLUGINS:
-                if isinstance(cmd, dict):
-                    categories.add(cmd.get("category", "core"))
-                else:
-                    categories.add("core")
-            num_plugins = len(categories) or 20
-        else:
-            total_commands = 84
-            num_plugins = 20
+        # Get total stats
+        total_commands = 84
+        num_plugins = 20
         
         # Build message
         msg = HELP_TEXT.format(
             total=total_commands,
-            plugins=num_plugins
+            plugins=num_plugins,
+            bot=BOT_USERNAME
         )
+        msg += build_category_list()
+        msg += f"\n**💡 Tip:** Search `{BOT_USERNAME}` and send `/start` for clickable buttons!"
         
-        # Build inline keyboard (HellBot style)
-        buttons = build_category_buttons()
-        
-        # Send message with inline buttons
-        await event.respond(msg, parse_mode="md", buttons=buttons)
+        # Send message (no buttons - userbots can't send inline keyboards)
+        await event.respond(msg, parse_mode="md")
         
     except Exception as e:
         await event.respond(f"❌ Error: {e}")
@@ -185,30 +106,26 @@ async def help_handler(event):
 @atomic_command(
     "cmds",
     pattern=r"\.cmds",
-    help="List all commands",
+    help="List all commands by category",
     usage=".cmds",
     category="core"
 )
 async def cmds_handler(event):
-    """List all commands"""
+    """List all commands by category"""
     try:
         msg = """
 ╔═══════════════════════════════════════════════╗
 ║      📜  All Commands  📜                      ║
 ╠═══════════════════════════════════════════════╣
 ║                                               ║
-║  **Use .help for categorized menu**           ║
+║  **For INLINE BUTTON menu use:**              ║
+║  👉 @AllAtomicBot                             ║
 ║                                               ║
-║  **Quick commands:**                          ║
-║  `.alive` `.ping` `.help` `.settings`         ║
-║  `.repo` `.support` `.gcast` `.sudo`          ║
-║                                               ║
-╚═══════════════════════════════════════════════╝
 """
+        msg += build_category_list()
+        msg += "\n**💡 Search @AllAtomicBot for clickable menu!**"
         
-        buttons = build_category_buttons()
-        
-        await event.respond(msg, parse_mode="md", buttons=buttons)
+        await event.respond(msg, parse_mode="md")
         
     except Exception as e:
         await event.respond(f"❌ Error: {e}")
@@ -217,12 +134,12 @@ async def cmds_handler(event):
 # Commands registry
 commands = {
     "help": {
-        "help": "Show HellBot-style help menu with inline buttons",
+        "help": "Show help menu with category list",
         "usage": ".help",
         "category": "core"
     },
     "cmds": {
-        "help": "List all commands",
+        "help": "List all commands by category",
         "usage": ".cmds",
         "category": "core"
     }
