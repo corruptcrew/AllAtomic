@@ -6,7 +6,7 @@ Uses BOT_TOKEN to send inline keyboard messages (HellBot method)
 import asyncio
 from telethon import TelegramClient
 from telethon.tl.custom import Button
-from telethon.tl.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telethon.tl.types import MessageEntity
 from plugins import atomic_command, REGISTERED_PLUGINS
 from app.config import Config
 from app.logger import log
@@ -71,27 +71,27 @@ def build_category_buttons():
     for i in range(0, len(category_items), 2):
         row = []
         cat1_name, cat1_data = category_items[i]
-        row.append(InlineKeyboardButton(
+        row.append(Button.inline(
             text=f"⚙️ {cat1_name}",
-            callback_data=f"help_cat_{cat1_name}"
+            data=f"help_cat_{cat1_name}"
         ))
         
         if i + 1 < len(category_items):
             cat2_name, cat2_data = category_items[i + 1]
-            row.append(InlineKeyboardButton(
+            row.append(Button.inline(
                 text=f"📦 {cat2_name}",
-                callback_data=f"help_cat_{cat2_name}"
+                data=f"help_cat_{cat2_name}"
             ))
         
         keyboard.append(row)
     
     # Add navigation buttons
     keyboard.append([
-        InlineKeyboardButton(text="👥 Support", url="https://t.me/ComputeCode"),
-        InlineKeyboardButton(text="📦 GitHub", url="https://github.com/corruptcrew/AllAtomic"),
+        Button.url(text="👥 Support", url="https://t.me/ComputeCode"),
+        Button.url(text="📦 GitHub", url="https://github.com/corruptcrew/AllAtomic"),
     ])
     
-    return InlineKeyboardMarkup(keyboard)
+    return keyboard
 
 
 async def send_help_with_bot(event, config):
