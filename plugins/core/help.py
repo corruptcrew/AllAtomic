@@ -63,9 +63,6 @@ HELP_TEXT = """
 async def help_handler(event):
     """Show help menu with all categories"""
     try:
-        from app.client import client
-        config = client.config
-        
         total_commands = 84
         num_plugins = 20
         
@@ -101,9 +98,6 @@ async def help_handler(event):
 async def cmds_handler(event):
     """List all commands"""
     try:
-        from app.client import client
-        config = client.config
-        
         msg = """
 ╔═══════════════════════════════════════════════╗
 ║      📜  All Commands  📜                      ║
