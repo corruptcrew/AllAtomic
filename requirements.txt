@@ -13,7 +13,7 @@ pytz
 google-search-results
 youtube-search
 spotipy
-ytdl-core
+yt-dlp
 wget
 speedtest-cli
 ffmpeg-python
