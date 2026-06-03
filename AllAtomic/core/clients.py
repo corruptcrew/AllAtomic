@@ -117,7 +117,7 @@ class AtomicClient(Client):
             f"**{Symbols.triangle_right} Commands:** `{len(Config.CMD_INFO)}`\n"
             f"**{Symbols.triangle_right} Stan Users:** `{len(Config.STAN_USERS)}`\n"
             f"**{Symbols.triangle_right} Auth Users:** `{len(Config.AUTH_USERS)}`\n\n"
-            f"**{Symbols.triangle_right} AllAtomic Version:** `{version['AllAtomic']}`\n"
+            f"**{Symbols.triangle_right} AllAtomic Version:** `{version['hellbot']}`\n"
             f"**{Symbols.triangle_right} Pyrogram Version:** `{version['pyrogram']}`\n"
             f"**{Symbols.triangle_right} Python Version:** `{version['python']}`\n\n"
             f"**Dev:** @GhostMarshal\n**Channel:** @ComputeCode",
@@ -229,4 +229,4 @@ class CustomMethods(AtomicClient):
             await self._log(tag, text, file)
 
 
-AllAtomic = CustomMethods()
+hellbot = CustomMethods()
