@@ -8,14 +8,14 @@ from AllAtomic.core import (
     TemplateSetup,
     UserSetup,
     db,
-    AllAtomic,
+    hellbot,
 )
 from AllAtomic.functions.tools import initialize_git
 from AllAtomic.functions.utility import BList, Flood, TGraph
 
 
 async def main():
-    await AllAtomic.startup()
+    await hellbot.startup()
     await db.connect()
     await UserSetup()
     await ForcesubSetup()
@@ -25,9 +25,9 @@ async def main():
     await BList.updateBlacklists()
     await TGraph.setup()
     await initialize_git(Config.PLUGINS_REPO)
-    await AllAtomic.start_message(__version__)
+    await hellbot.start_message(__version__)
     await idle()
 
 
 if __name__ == "__main__":
-    AllAtomic.run(main())
+    hellbot.run(main())
