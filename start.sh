@@ -1,32 +1,19 @@
 #!/bin/bash
-# AllAtomic Userbot - Startup Script
-# Dev: @GhostMarshal | Channel: @ComputeCode
 
-echo "╔═══════════════════════════════════════════════════════╗"
-echo "║           ⚛️  AllAtomic Userbot Starting             ║"
-echo "╚═══════════════════════════════════════════════════════╝"
+# AllAtomic Userbot Startup Script
+
+echo "⚛️  Starting AllAtomic Userbot..."
 
 # Check if .env exists
 if [ ! -f .env ]; then
-    echo "❌ .env file not found!"
-    echo "📋 Copy .env.example to .env and fill in your values:"
-    echo "   cp .env.example .env"
+    echo "❌ .env file not found! Copy .env.example to .env and fill in your credentials."
     exit 1
 fi
 
-# Check if virtual environment exists
-if [ ! -d "venv" ]; then
-    echo "🔧 Creating virtual environment..."
-    python3 -m venv venv
-fi
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Install requirements
+# Install dependencies
 echo "📦 Installing dependencies..."
-pip install -q -r requirements.txt
+pip3 install -r requirements.txt --break-system-packages
 
-# Start the bot
-echo "🚀 Starting AllAtomic Userbot..."
-python3 app/main.py
+# Run the bot
+echo "🚀 Starting AllAtomic..."
+python3 -m AllAtomic

@@ -1,86 +1,45 @@
 {
-  "name": "AllAtomic Userbot",
-  "description": "The Ultimate Telegram Userbot - 200+ commands, group management, media downloads, and more",
-  "repository": "https://github.com/corruptcrew/AllAtomic",
-  "logo": "https://raw.githubusercontent.com/corruptcrew/AllAtomic/main/assets/banner.gif",
-  "keywords": ["telegram", "userbot", "telethon", "automation", "anime"],
-  "website": "https://t.me/ComputeCode",
-  "success_url": "https://t.me/ComputeCode",
-  "env": {
-    "API_ID": {
-      "description": "Get this from my.telegram.org",
-      "required": true,
-      "value": ""
+    "name": "AllAtomic Userbot",
+    "description": "A turbocharged Telegram userbot with purple anime theme",
+    "repository": "https://github.com/corruptcrew/AllAtomic",
+    "logo": "https://i.imgur.com/2Qz9W1K.gif",
+    "keywords": ["telegram", "userbot", "pyrogram", "allatomic"],
+    "env": {
+        "API_ID": {
+            "description": "Get this from https://my.telegram.org",
+            "required": true
+        },
+        "API_HASH": {
+            "description": "Get this from https://my.telegram.org",
+            "required": true
+        },
+        "BOT_TOKEN": {
+            "description": "Bot token from @BotFather",
+            "required": true
+        },
+        "DATABASE_URL": {
+            "description": "MongoDB connection string",
+            "required": true
+        },
+        "LOGGER_ID": {
+            "description": "Logger group/channel ID (include negative sign for channels)",
+            "required": true
+        },
+        "OWNER_ID": {
+            "description": "Your Telegram user ID",
+            "required": true
+        },
+        "HANDLERS": {
+            "description": "Command handlers (default: . ! ?)",
+            "value": ". ! ?",
+            "required": false
+        }
     },
-    "API_HASH": {
-      "description": "Get this from my.telegram.org",
-      "required": true,
-      "value": ""
+    "formation": {
+        "worker": {
+            "quantity": 1,
+            "size": "basic"
+        }
     },
-    "SESSION_STRING": {
-      "description": "Run generate_string_session.py or use Railway shell",
-      "required": true,
-      "value": ""
-    },
-    "OWNER_ID": {
-      "description": "Your Telegram User ID (get from @userinfobot)",
-      "required": true,
-      "value": ""
-    },
-    "DATABASE_URL": {
-      "description": "Heroku Postgres auto-provides this - leave blank",
-      "required": false,
-      "value": ""
-    },
-    "HANDLER": {
-      "description": "Command prefix for the bot",
-      "required": false,
-      "value": "."
-    },
-    "HEROKU_API_KEY": {
-      "description": "Heroku API Key (for .heroku commands)",
-      "required": false,
-      "value": ""
-    },
-    "HEROKU_APP_NAME": {
-      "description": "Your Heroku app name (for .heroku commands)",
-      "required": false,
-      "value": ""
-    },
-    "OPENAI_API_KEY": {
-      "description": "OpenAI API Key (for AI chat features)",
-      "required": false,
-      "value": ""
-    },
-    "LOGGER_ID": {
-      "description": "Logger Channel/Group ID (optional)",
-      "required": false,
-      "value": ""
-    }
-  },
-  "formation": {
-    "worker": {
-      "quantity": 1,
-      "size": "eco"
-    }
-  },
-  "addons": [
-    {
-      "plan": "heroku-postgresql:essential-0",
-      "options": {
-        "version": "15"
-      }
-    }
-  ],
-  "buildpacks": [
-    {
-      "url": "heroku/python"
-    },
-    {
-      "url": "https://github.com/heroku/heroku-buildpack-ffmpeg#latest"
-    },
-    {
-      "url": "https://github.com/heroku/heroku-buildpack-google-chrome#latest"
-    }
-  ]
+    "stack": "container"
 }
