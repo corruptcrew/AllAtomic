@@ -100,12 +100,16 @@ async def send_help_with_bot(event, config):
         # Get bot token from config
         bot_token = config.BOT_TOKEN
         
+        log.info(f"Bot token configured: {bool(bot_token)}")
+        
         if not bot_token:
             # Fallback: send text-only message
+            log.warning("BOT_TOKEN not configured")
             await event.respond("❌ BOT_TOKEN not configured. Please add BOT_TOKEN to .env file.")
             return
         
         # Create bot client using the same API credentials
+        log.info("Creating bot client...")
         bot_client = TelegramClient(
             'allatomic_help_bot',
             config.APP_ID,
@@ -114,7 +118,12 @@ async def send_help_with_bot(event, config):
         )
         
         # Start bot client
+        log.info("Starting bot client...")
         await bot_client.start(bot_token=bot_token)
+        
+        # Verify bot is connected
+        bot_info = await bot_client.get_me()
+        log.info(f"Bot connected as: {bot_info.first_name} (@{bot_info.username})")
         
         # Build message
         total_commands = 84
@@ -127,8 +136,10 @@ async def send_help_with_bot(event, config):
         
         # Build inline keyboard
         buttons = build_category_buttons()
+        log.info(f"Built {len(buttons)} rows of buttons")
         
         # Send message with inline keyboard (via bot, not userbot!)
+        log.info(f"Sending message to chat {event.chat_id}...")
         sent_msg = await bot_client.send_message(
             event.chat_id,
             msg,
@@ -136,14 +147,16 @@ async def send_help_with_bot(event, config):
             parse_mode='md'
         )
         
-        # Log the action
-        log.info(f"Help message sent via bot to chat {event.chat_id}")
+        log.info(f"Message sent successfully! Message ID: {sent_msg.id if sent_msg else 'None'}")
         
         # Close bot client
         await bot_client.disconnect()
+        log.info("Bot client disconnected")
         
     except Exception as e:
         log.error(f"Error sending help via bot: {e}")
+        import traceback
+        log.error(traceback.format_exc())
         # Fallback: send text-only message
         await event.respond(f"❌ Error: {e}")
 
