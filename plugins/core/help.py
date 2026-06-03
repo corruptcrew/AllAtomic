@@ -6,7 +6,7 @@ Uses BOT_TOKEN to send inline keyboard messages (HellBot method)
 import asyncio
 from telethon import TelegramClient
 from telethon.tl.custom import Button
-from telethon.tl.types import InlineKeyboardMarkup
+from telethon.tl.types import InlineKeyboardMarkup, InlineKeyboardButton
 from plugins import atomic_command, REGISTERED_PLUGINS
 from app.config import Config
 from app.logger import log
@@ -64,34 +64,34 @@ HELP_TEXT = """
 
 def build_category_buttons():
     """Build inline keyboard buttons for all categories (HellBot style)"""
-    buttons = []
+    keyboard = []
     category_items = list(HELP_CATEGORIES.items())
     
     # Create rows of 2 buttons each (HellBot style)
     for i in range(0, len(category_items), 2):
         row = []
         cat1_name, cat1_data = category_items[i]
-        row.append(Button.inline(
-            f"⚙️ {cat1_name}",
-            data=f"help_cat_{cat1_name}"
+        row.append(InlineKeyboardButton(
+            text=f"⚙️ {cat1_name}",
+            callback_data=f"help_cat_{cat1_name}"
         ))
         
         if i + 1 < len(category_items):
             cat2_name, cat2_data = category_items[i + 1]
-            row.append(Button.inline(
-                f"📦 {cat2_name}",
-                data=f"help_cat_{cat2_name}"
+            row.append(InlineKeyboardButton(
+                text=f"📦 {cat2_name}",
+                callback_data=f"help_cat_{cat2_name}"
             ))
         
-        buttons.append(row)
+        keyboard.append(row)
     
     # Add navigation buttons
-    buttons.append([
-        Button.url("👥 Support", "https://t.me/ComputeCode"),
-        Button.url("📦 GitHub", "https://github.com/corruptcrew/AllAtomic"),
+    keyboard.append([
+        InlineKeyboardButton(text="👥 Support", url="https://t.me/ComputeCode"),
+        InlineKeyboardButton(text="📦 GitHub", url="https://github.com/corruptcrew/AllAtomic"),
     ])
     
-    return buttons
+    return InlineKeyboardMarkup(keyboard)
 
 
 async def send_help_with_bot(event, config):
@@ -134,17 +134,17 @@ async def send_help_with_bot(event, config):
             plugins=num_plugins
         )
         
-        # Build inline keyboard
-        buttons = build_category_buttons()
-        log.info(f"Built {len(buttons)} rows of buttons")
+        # Build inline keyboard (using Telethon's InlineKeyboardMarkup for bot)
+        keyboard = build_category_buttons()
+        log.info(f"Built inline keyboard with {len(keyboard)} rows")
         
         # Send message with inline keyboard (via bot, not userbot!)
         log.info(f"Sending message to chat {event.chat_id}...")
         sent_msg = await bot_client.send_message(
             event.chat_id,
             msg,
-            buttons=buttons,
-            parse_mode='md'
+            parse_mode='md',
+            reply_markup=keyboard
         )
         
         log.info(f"Message sent successfully! Message ID: {sent_msg.id if sent_msg else 'None'}")
