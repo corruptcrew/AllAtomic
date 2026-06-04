@@ -229,4 +229,4 @@ class CustomMethods(AtomicClient):
             await self._log(tag, text, file)
 
 
-hellbot = CustomMethods()
+AllAtomic = CustomMethods()
