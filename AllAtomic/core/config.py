@@ -1,9 +1,11 @@
-from os import getenv
+from os import getenv, path
 
 from dotenv import load_dotenv
 from pyrogram import filters
 
-load_dotenv()
+# Explicitly load .env from the correct location
+env_path = path.join(path.dirname(__file__), '..', '.env')
+load_dotenv(env_path)
 
 
 class Config:
