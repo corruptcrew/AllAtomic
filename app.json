@@ -1,45 +1,81 @@
 {
-    "name": "AllAtomic Userbot",
-    "description": "A turbocharged Telegram userbot with purple anime theme",
-    "repository": "https://github.com/corruptcrew/AllAtomic",
-    "logo": "https://i.imgur.com/2Qz9W1K.gif",
-    "keywords": ["telegram", "userbot", "pyrogram", "allatomic"],
-    "env": {
-        "API_ID": {
-            "description": "Get this from https://my.telegram.org",
-            "required": true
-        },
-        "API_HASH": {
-            "description": "Get this from https://my.telegram.org",
-            "required": true
-        },
-        "BOT_TOKEN": {
-            "description": "Bot token from @BotFather",
-            "required": true
-        },
-        "DATABASE_URL": {
-            "description": "MongoDB connection string",
-            "required": true
-        },
-        "LOGGER_ID": {
-            "description": "Logger group/channel ID (include negative sign for channels)",
-            "required": true
-        },
-        "OWNER_ID": {
-            "description": "Your Telegram user ID",
-            "required": true
-        },
-        "HANDLERS": {
-            "description": "Command handlers (default: . ! ?)",
-            "value": ". ! ?",
-            "required": false
-        }
+  "name": "AllAtomic",
+  "description": "Your Ultimate Telegram Userbot (✿◠‿◠)",
+  "repository": "https://github.com/corruptcrew/AllAtomic",
+  "logo": "https://te.legra.ph/file/9a8cff9a8cff9a8cff.jpg",
+  "keywords": ["telegram", "userbot", "pyrogram", "anime", "purple"],
+  "env": {
+    "API_ID": {
+      "description": "Telegram API ID from my.telegram.org",
+      "value": "",
+      "required": true
     },
-    "formation": {
-        "worker": {
-            "quantity": 1,
-            "size": "basic"
-        }
+    "API_HASH": {
+      "description": "Telegram API Hash from my.telegram.org",
+      "value": "",
+      "required": true
     },
-    "stack": "container"
+    "STRING_SESSION": {
+      "description": "Pyrogram session string",
+      "value": "",
+      "required": true
+    },
+    "BOT_TOKEN": {
+      "description": "Bot token from @BotFather",
+      "value": "",
+      "required": false
+    },
+    "MONGO_URL": {
+      "description": "MongoDB connection URL",
+      "value": "mongodb://localhost:27017",
+      "required": false
+    },
+    "DB_NAME": {
+      "description": "Database name",
+      "value": "AllAtomic",
+      "required": false
+    },
+    "OWNER_ID": {
+      "description": "Your Telegram user ID",
+      "value": "",
+      "required": false
+    },
+    "SUDO_USERS": {
+      "description": "Sudo user IDs (comma-separated)",
+      "value": "",
+      "required": false
+    },
+    "PM_PERMIT": {
+      "description": "Enable PM permit",
+      "value": "true",
+      "required": false
+    },
+    "HEROKU_APP_NAME": {
+      "description": "Heroku app name",
+      "value": "",
+      "required": false
+    },
+    "HEROKU_API_KEY": {
+      "description": "Heroku API key",
+      "value": "",
+      "required": false
+    }
+  },
+  "scripts": {
+    "start": "python -m AllAtomic"
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-redis:mini"
+    },
+    {
+      "plan": "mongolab:sandbox"
+    }
+  ]
 }

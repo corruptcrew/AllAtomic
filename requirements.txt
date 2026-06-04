@@ -1,21 +1,40 @@
-pyroaddon
-pyrogram>=2.0.106
-tgcrypto
-motor
-dnspython
-heroku3
-requests
-aiohttp
-beautifulsoup4
-telegraph
-Pillow
-pytz
-google-search-results
-youtube-search
-spotipy
-yt-dlp
-wget
-speedtest-cli
-ffmpeg-python
-gitpython
-python-dotenv
+# AllAtomic - Python Dependencies
+Dev: @GhostMarshal | Channel: @ComputeCode
+(૨๑•̀ㅁ•́ฅा) Purple Anime Theme (#9A8CFF)
+
+# Core Framework
+pyrogram>=2.0.109
+tgcrypto>=1.2.5
+
+# Database
+motor>=3.3.0
+pymongo>=4.6.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+# HTTP requests
+aiohttp>=3.9.0
+
+# Utilities
+speedtest-cli>=2.1.3
+
+# AI/ML (optional)
+# openai>=1.0.0
+
+# Image processing (optional)
+# pillow>=10.0.0
+# pytesseract>=0.3.10
+
+# OCR (optional)
+# opencv-python>=4.8.0
+
+# News API (optional)
+# newsapi-python>=0.2.7
+
+# Web scraping (optional)
+# beautifulsoup4>=4.12.0
+
+# More utilities
+requests>=2.31.0
+httpx>=0.25.0

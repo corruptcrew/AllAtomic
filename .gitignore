@@ -1,3 +1,7 @@
+# AllAtomic - Git Ignore
+Dev: @GhostMarshal | Channel: @ComputeCode
+(૨๑•̀ㅁ•́ฅा) Purple Anime Theme (#9A8CFF)
+
 # Python
 __pycache__/
 *.py[cod]
@@ -24,25 +28,22 @@ wheels/
 venv/
 env/
 ENV/
-.venv
+env.bak/
+venv.bak/
 
-# Environment
+# Environment Variables
 .env
 .env.local
 .env.*.local
 
 # Logs
 *.log
-allatomic.log
+logs/
 
 # Database
 *.db
 *.sqlite
 *.sqlite3
-
-# Data
-data/
-uploads/
 
 # IDE
 .vscode/
@@ -54,3 +55,23 @@ uploads/
 # OS
 .DS_Store
 Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+
+# Backup files
+*.bak
+backup/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Heroku
+Procfile.dev
+
+# Docker
+.docker/

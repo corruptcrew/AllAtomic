@@ -1,126 +1,280 @@
-<p align="center">
-  <img src="https://i.imgur.com/2Qz9W1K.gif" alt="AllAtomic">
-</p>
+# AllAtomic - Telegram Userbot (✿◠‿◠)
 
-<h1 align="center"><b>AllAtomic Userbot</b></h1>
+<div align="center">
 
-<p align="center"><b>⚛️ Turbocharged Telegram Userbot ⚛️</b></p>
+![AllAtomic](https://te.legra.ph/file/9a8cff9a8cff9a8cff.jpg)
 
-<h3 align="center">
-    Packed with the latest commands, limitless features, and a beautiful purple anime theme!
-</h3>
+**Your Ultimate Telegram Userbot**
 
----
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-![GitHub forks](https://img.shields.io/github/forks/corruptcrew/AllAtomic?style=social)
-![GitHub Repo stars](https://img.shields.io/github/stars/corruptcrew/AllAtomic?style=social)
+**Dev:** [@GhostMarshal](https://t.me/GhostMarshal)  
+**Channel:** [@ComputeCode](https://t.me/ComputeCode)  
+**GitHub:** [corruptcrew/AllAtomic](https://github.com/corruptcrew/AllAtomic)
 
-![Maintenance](https://img.shields.io/badge/Maintained%3F-Yes-white?&style=social&logo=hugo)
-![GitHub license](https://img.shields.io/github/license/corruptcrew/AllAtomic?&style=social&logo=github)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-![Python](https://img.shields.io/badge/Python-v3.10-white?style=social&logo=python)
-![Pyrogram](https://img.shields.io/badge/Pyrogram-v2.0-white?style=social&logo=pyrogram)
+</div>
 
-[![Telegram Group](https://img.shields.io/badge/Telegram-Support-white?&style=social&logo=telegram)](https://t.me/ComputeCode)
-[![Telegram Channel](https://img.shields.io/badge/Telegram-Channel-white?&style=social&logo=telegram)](https://t.me/ComputeCode)
+<div align="center">
 
----
+![Purple Theme](https://img.shields.io/badge/Theme-Purple-%239A8CFF)
+![Version](https://img.shields.io/badge/Version-2.0.0-blue)
+![License](https://img.shields.io/badge/License-GPL--3.0-green)
 
-## 🌸 Features
-
-- **80+ Powerful Commands** - Admin, Fun, Utility, Media, Anime, AI, and more!
-- **Inline Menu Support** - Use @AllAtomicBot in any chat
-- **Multi-Session Support** - Run multiple user sessions
-- **Plugin System** - Easy to extend and customize
-- **Purple Anime Theme** - Beautiful kaomoji and styling
-- **Database Support** - MongoDB for persistent data
-- **Heroku Ready** - Deploy in minutes
+</div>
 
 ---
 
-## 🚀 Quick Deploy
+## (૨๑•̀ㅁ•́ฅा) Features
 
-### Deploy to Heroku
+### Core Features
+- ✨ **Multi-session Support** - Run multiple accounts
+- 🚀 **Auto Plugin Discovery** - Load plugins automatically
+- 💾 **MongoDB Database** - Persistent storage
+- 🎨 **Purple Anime Theme** - Beautiful kaomoji and colors
+- 🔧 **Inline Menu Support** - Bot commands with inline buttons
+- 📦 **80+ Commands** - Across 13 categories
 
-1. **Fork & Star this Repo**
-   > Begin by [forking](https://github.com/corruptcrew/AllAtomic/fork) and [starring](https://github.com/corruptcrew/AllAtomic/) this repository.
+### Command Categories
+1. **Core** - Start, help, stats, ping, credits
+2. **Admin** - Ban, kick, mute, promote, gban
+3. **Fun** - Meme, joke, dice, rps, waifu
+4. **Utilities** - Time, date, paste, notes
+5. **Media** - Photo, video, audio, stickers
+6. **Anime** - Anime info, manga, characters, waifu images
+7. **AI** - Chat with AI, image generation, translate
+8. **Tools** - Wiki, weather, trivia, facts
+9. **Group** - Welcome, goodbye, purge, tag
+10. **User** - Forward, reply, clean, clear
+11. **Search** - Reverse image, OCR, lyrics
+12. **Broadcast** - Send to all users
+13. **Other** - Afk, uptime, id
 
-2. **Click "Deploy to Heroku"**
-   > Find the button below and click it.
+---
 
-3. **Fill Required Variables**
-   > Set your API credentials, bot token, and database URL.
+## (◕‿◕) Installation
 
-<p align="center">
-    <a href="https://heroku.com/deploy"><img src="https://img.shields.io/badge/Deploy%20To%20Heroku-black?style=for-the-badge&logo=heroku"/></a>
-</p>
+### Method 1: Heroku (Recommended)
 
-### Deploy to VPS
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/corruptcrew/AllAtomic)
+
+1. Click the button above
+2. Fill in your environment variables
+3. Deploy!
+
+### Method 2: VPS/Dedicated Server
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/corruptcrew/AllAtomic.git
 cd AllAtomic
 
 # Install dependencies
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 
-# Create .env file
+# Copy environment file
 cp .env.example .env
+
 # Edit .env with your credentials
+nano .env
 
 # Run the bot
-python3 -m AllAtomic
+python -m AllAtomic
+```
+
+### Method 3: Docker
+
+```bash
+# Build image
+docker build -t allatomic .
+
+# Run container
+docker run -d --name allatomic -v $(pwd)/.env:/app/.env allatomic
 ```
 
 ---
 
-## ⚙️ Environment Variables
+## (🔥) Configuration
 
-| Variable | Description |
-|----------|-------------|
-| `API_ID` | Your Telegram API ID |
-| `API_HASH` | Your Telegram API Hash |
-| `BOT_TOKEN` | Bot token from @BotFather |
-| `DATABASE_URL` | MongoDB connection string |
-| `LOGGER_ID` | Logger group/channel ID |
-| `OWNER_ID` | Your Telegram user ID |
+### Environment Variables
 
----
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `API_ID` | Telegram API ID | ✅ |
+| `API_HASH` | Telegram API Hash | ✅ |
+| `STRING_SESSION` | Pyrogram session string | ✅ |
+| `BOT_TOKEN` | Bot token (for inline) | ⚠️ |
+| `MONGO_URL` | MongoDB connection URL | ⚠️ |
+| `OWNER_ID` | Your user ID | ⚠️ |
+| `SUDO_USERS` | Sudo user IDs | ⚠️ |
 
-## 📦 Command Categories
+### Get String Session
 
-- **Core** - alive, ping, help, settings
-- **Admin** - ban, kick, mute, pin, purge
-- **Fun** - joke, meme, quote, love, rate
-- **Utility** - weather, time, date, info, userid
-- **Media** - dl, upload, tts, sticker, kang
-- **Stickers** - kang, sticker, fullpp, dp
-- **Anime** - waifu, neko, waifupic, anime, manga
-- **AI** - ai, chat, ask, gpt
-- **Group** - welcome, goodbye, notes, gcast
-- **Advanced** - eval, exec, term, sudo
-- **PM Permit** - pmpermit, approve, block
-- **Voice** - play, pause, stop, skip
-- **Direct** - direct, source, github, link
+1. Visit [replit](https://replit.com/@GhostMarshal/StringSession-Generator)
+2. Run the generator
+3. Copy your session string
 
 ---
 
-## 💜 Credits
+## (✨) Commands
 
-- **Dev:** [@GhostMarshal](https://t.me/GhostMarshal)
+### Core Commands
+```
+/start - Start the bot
+/help - Show help
+/stats - Show bot stats
+/ping - Check latency
+/source - Get source code
+/credits - Show credits
+```
+
+### Admin Commands
+```
+/admins - List admins
+/addadmin - Add admin
+/rmadmin - Remove admin
+/ban - Ban user
+/unban - Unban user
+/kick - Kick user
+/gban - Global ban
+/ungban - Remove gban
+```
+
+### Fun Commands
+```
+/meme - Get random meme
+/joke - Get random joke
+/quote - Get random quote
+/roll - Roll dice
+/flip - Coin flip
+/rps - Rock Paper Scissors
+/waifu - Get waifu image
+/neko - Get neko image
+```
+
+### Anime Commands
+```
+/anime <name> - Get anime info
+/manga <name> - Get manga info
+/character <name> - Get character info
+/waifu - Get waifu
+/neko - Get neko
+/megumin - Get Megumin
+/shinobu - Get Shinobu
+/kitsune - Get Kitsune
+```
+
+### AI Commands
+```
+/ai <message> - Chat with AI
+/dall <prompt> - Generate image
+/translate - Translate text
+/wiki <topic> - Wikipedia
+/weather <city> - Weather info
+```
+
+### Utility Commands
+```
+/time - Show time
+/date - Show date
+/id - Show IDs
+/paste - Paste text
+/note - Manage notes
+/afk - Set AFK status
+```
+
+---
+
+## (💜) Screenshots
+
+<div align="center">
+
+| Main Menu | Commands List | Anime Waifu |
+|-----------|---------------|-------------|
+| 🌸 | 🎨 | 🌺 |
+| 🌼 | 🍥 | 🌸 |
+
+</div>
+
+---
+
+## (🔥) Deployment Options
+
+### Heroku
+- Easy one-click deploy
+- Free tier available
+- Automatic updates
+
+### VPS
+- Full control
+- Better performance
+- Custom configuration
+
+### Replit
+- Cloud-based
+- Easy to use
+- Always online
+
+### Docker
+- Containerized
+- Platform independent
+- Easy scaling
+
+---
+
+## (✨) Plugins
+
+AllAtomic supports auto-loading plugins from the `plugins/user/` directory.
+
+### Create a Plugin
+
+```python
+from pyrogram import filters
+from AllAtomic import log, clients, config
+
+async def load(bot):
+    @bot.on_message(filters.command("hello"))
+    async def hello(client, message):
+        await message.reply("Hello! (✿◠‿◠)")
+```
+
+---
+
+## (💜) Credits
+
+- **Developer:** [@GhostMarshal](https://t.me/GhostMarshal)
 - **Channel:** [@ComputeCode](https://t.me/ComputeCode)
-- **Base:** Inspired by HellBot
-- **Theme:** Purple Anime ⚛️
+- **Theme:** Purple Anime (#9A8CFF)
+- **Framework:** Pyrogram v2.x
+- **Database:** MongoDB
+- **License:** GPL-3.0
 
 ---
 
-## 📜 License
+## (🔥) Support
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- **Channel:** [@ComputeCode](https://t.me/ComputeCode)
+- **GitHub:** [corruptcrew/AllAtomic](https://github.com/corruptcrew/AllAtomic)
+- **Issues:** [Report bugs](https://github.com/corruptcrew/AllAtomic/issues)
 
 ---
 
-<p align="center">
-  <i>Made with 💜 and kaomoji (૮๑•̀ㅁ•́ฅა) (✿◠‿◠)</i>
-</p>
+## (✨) License
+
+This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+**Made with ❤️ and kaomoji**  
+(૨๑•̀ㅁ•́ฅा) (✿◠‿◠) (◕‿◕)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+**AllAtomic v2.0.0** | **Dev: @GhostMarshal** | **Channel: @ComputeCode**
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+</div>
